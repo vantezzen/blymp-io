@@ -1,0 +1,151 @@
+/* General styles */
+body {
+  text-align: center;
+  margin: 0;
+  background-color: #352F44;
+  min-width: 100vw;
+  min-height: 100vh;
+
+  font-family: "Gothic A1", -apple-system, BlinkMacSystemFont, "Avenir Next", Avenir, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  color: #FFFFFF;
+}
+
+#root {
+  margin-top: 3rem;
+}
+
+/* Animation between routes */
+.fade-enter {
+  opacity: 0.01;
+}
+.fade-enter.fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
+  transition-delay: 200ms;
+}
+
+.fade-exit {
+  position: absolute;
+  top: 3rem;
+  width: 100vw;
+  height: 100vh;
+
+  opacity: 1;
+}
+.fade-exit.fade-exit-active {
+  opacity: 0.01;
+  transition: opacity 200ms ease-in;
+}
+
+/* Section style */
+.section-container {
+  display: flex;
+  justify-content: center;
+}
+.section {
+  background-color: #2A2438;
+  padding: 1rem;
+  border-radius: 15px;
+  
+  display: flex;
+  justify-content: center;
+}
+
+/* Code input */
+.code-input input:last-child {
+  margin-right: 0 !important;
+}
+.code-input input {
+  /* font-family: 'Courier New', Courier, monospace; */
+  border: none;
+  font-size: 4rem;
+  height: 80px;
+  width: 60px;
+  text-align: center;
+  margin-right: 15px;
+  border-radius: 10px;
+  background-color: #411E8F !important;
+  color: #FFFFFF !important;
+  outline: none;
+}
+.code-input input::-webkit-outer-spin-button,
+.code-input input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-2px, 0, 0);
+  }
+  
+  20%, 80% {
+    transform: translate3d(4px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-6px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(6px, 0, 0);
+  }
+}
+
+/* File input */
+.file-input input {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+.file-input label, button {
+  color: #f1e5e6;
+  background-color: #8641D4;
+  max-width: 80%;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.625rem 1.25rem;
+  border: 0;
+}
+button:disabled {
+  background-color: #b3b3b3;
+  cursor: default;
+}
+.file-input label svg {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  fill: currentColor;
+  margin-top: -0.25em;
+  margin-right: 1em;
+}
+
+/* Footer */
+.footer {
+  position: relative;
+  bottom: 0;
+  width: 100vw;
+  text-align: center;
+  padding-bottom: 20px;
+  padding-top: 30px;
+  color: #BEBEBE;
+}
+.footer a {
+  color: #BEBEBE;
+}
+
+/* Compatibility page */
+.compatibility h5 {
+  display: flex;
+  justify-content: center;
+}
+.compatibility h5 svg {
+  margin-right: 0.5em;
+}
