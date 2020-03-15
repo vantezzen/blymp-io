@@ -6,6 +6,7 @@
   "scripts": {
     "build": "webpack --mode production",
     "start": "npm run build && node src/server/index.js",
+    "heroku-prebuild": "npm install --dev",
     "client": "webpack-dev-server --mode development --devtool inline-source-map --hot",
     "server": "nodemon src/server/index.js",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
