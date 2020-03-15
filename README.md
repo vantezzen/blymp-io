@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://blymp.io">
-      <img src="./logo.png" alt="blymp.io logo" width="250"/>
+      <img src="./icon.png" alt="blymp.io logo" width="250"/>
     </a>
 </p>
 
