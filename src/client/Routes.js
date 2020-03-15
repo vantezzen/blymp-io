@@ -48,8 +48,6 @@ const Routes = ({ location }) => {
     openPage('/');
   };
 
-  console.log(location);
-
   return (
     <TransitionGroup>
       <CSSTransition
