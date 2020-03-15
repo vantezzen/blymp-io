@@ -4,7 +4,12 @@
     </a>
 </p>
 
-# blymp.io - Easily transfer files between devices
+<h1 align="center">
+  blymp.io
+</h1>
+<h2 align="center" style="margin-bottom:2rem">
+  Easily transfer files between devices
+</h2>
 
 blymp.io is a webapp that allows you to easily transfer files between devices with high speeds.
 
@@ -12,9 +17,8 @@ It uses modern technologies like WebRTC, Blobs and WebSockets to allow files to 
 
 You can use blymp.io by going to <https://blymp.io>
 
-- [blymp.io - Easily transfer files between devices](#blympio---easily-transfer-files-between-devices)
-  - [Quick Start](#quick-start)
-  - [Folder Structure](#folder-structure)
+- [Quick Start](#quick-start)
+- [Folder Structure](#folder-structure)
 
 ## Quick Start
 
