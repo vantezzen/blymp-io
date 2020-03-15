@@ -13,7 +13,7 @@ const Home = ({ transfer }) => (
   <div>
     <Heading fullSize />
 
-    {(!('WebSocket' in window) || !(window.Blob)) && (
+    {!window.Blob && (
       <>
         <Section>
           <InfoCircle color="#FFFFFF" fontSize="50" />
@@ -25,7 +25,7 @@ const Home = ({ transfer }) => (
           <br />
           Please try using a more modern browser
           <br />
-          or enabling WebSockets and Blobs.
+          or enabling JavaScript Blobs.
         </Section>
         <Spacer size="3rem" />
       </>

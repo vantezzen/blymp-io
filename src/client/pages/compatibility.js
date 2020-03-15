@@ -27,12 +27,22 @@ const Compatibility = () => {
   compatibilities.sockets = 'WebSocket' in window || 'MozWebSocket' in window;
   compatibilities.blob = !!window.Blob;
 
+  /**
+   * Possible status:
+   * 0 - Fully compatible
+   * 1 - Compatible but with lower speeds (no WebRTC)
+   * 2 - Compatible but with very low speeds (no WebRTC and no WebSockets)
+   * 3 - Not compatible
+   */
   let status = 0;
   if (!compatibilities.webrtc) {
     status = 1;
   }
-  if (!compatibilities.sockets || !compatibilities.blob) {
+  if (!compatibilities.webrtc && !compatibilities.sockets) {
     status = 2;
+  }
+  if (!compatibilities.blob) {
+    status = 3;
   }
 
   return (
@@ -59,6 +69,18 @@ const Compatibility = () => {
         ) }
         { status === 2 && (
           <>
+            <Happy color="#ffb580" fontSize="70" />
+            <h4>
+              Your browser is compatible but files may transfer with low speeds
+            </h4>
+            <p>
+              Try using a modern browser or enabling
+              WebRTC and WebSockets to improve transfer speeds
+            </p>
+          </>
+        ) }
+        { status === 3 && (
+          <>
             <Sad color="#f7656d" fontSize="70" />
             <h4>Your browser is not compatible</h4>
             <p>Try using a modern browser or enabling features like WebSockets and Blobs</p>
@@ -80,7 +102,7 @@ const Compatibility = () => {
               <td className="pb-3">
                 <h5>
                   <Status isCompatible={compatibilities.sockets} />
-                  WebSockets
+                  WebSockets (optional)
                 </h5>
                 blymp.io uses WebSockets for communication with our
                 servers and as a fallback method when trying to transfer files.
