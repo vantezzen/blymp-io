@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import CodeInput from 'react-code-input';
 import { Link } from 'react-router-dom';
+import InfoCircle from 'react-ionicons/lib/IosWarningOutline';
 
 import Heading from '../components/Heading';
 import Section from '../components/Section';
@@ -11,6 +12,24 @@ import Transfer from '../classes/Transfer';
 const Home = ({ transfer }) => (
   <div>
     <Heading fullSize />
+
+    {(!('WebSocket' in window) || !(window.Blob)) && (
+      <>
+        <Section>
+          <InfoCircle color="#FFFFFF" fontSize="50" />
+          <br />
+          Your device does not support the technologies
+          <br />
+          needed to make blymp.io work.
+          <br />
+          <br />
+          Please try using a more modern browser
+          <br />
+          or enabling WebSockets and Blobs.
+        </Section>
+        <Spacer size="3rem" />
+      </>
+    )}
 
     <Section>
       <h2>Send</h2>
