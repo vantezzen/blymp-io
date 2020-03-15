@@ -17,6 +17,7 @@
   "dependencies": {
     "@openfonts/gothic-a1_latin": "^1.44.0",
     "babel-polyfill": "^6.26.0",
+    "compression": "^1.7.4",
     "debug": "^4.1.1",
     "express": "^4.16.3",
     "file-saver": "^2.0.2",
