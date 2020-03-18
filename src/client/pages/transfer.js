@@ -6,6 +6,19 @@ import Heading from '../components/Heading';
 import Section from '../components/Section';
 import TransferClass from '../classes/Transfer';
 
+const roundToOneDecimal = num => Math.round(num * 10) / 10;
+
+// Format seconds into a better-readable format like hours or minutes
+const formatSeconds = (seconds) => {
+  if (seconds > 3600) {
+    return `${roundToOneDecimal(seconds / 3600)}h`;
+  }
+  if (seconds > 60) {
+    return `${Math.round(seconds / 60)}min`;
+  }
+  return `${seconds}s`;
+};
+
 const Transfer = ({ transfer }) => (
   <div>
     <Heading />
@@ -19,8 +32,10 @@ const Transfer = ({ transfer }) => (
         trailColor="#FFFFFF"
       />
       <h2>Transferring files...</h2>
-      <p style={{ color: '#B4B4B4' }}>
-        {`${transfer.estimate}s left`}
+      <p style={{ color: '#B4B4B4', lineHeight: 2 }}>
+        {`${formatSeconds(transfer.estimate)} left for this file`}
+        <br />
+        {`Currently transferring "${transfer.currentFileName}"`}
         <br />
         {`File ${transfer.currentFile} of ${transfer.totalFiles}`}
         <br />

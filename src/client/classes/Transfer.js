@@ -85,6 +85,11 @@ export default class Transfer {
   currentFile = 0;
 
   /**
+   * Name of the file we are currently transferring
+   */
+  currentFileName = '';
+
+  /**
    * Is this transfer completed?
    * @type Boolean
    */
@@ -100,7 +105,7 @@ export default class Transfer {
    * Number between 0-100, indicating the progress of the transfer of the current file
    * @type Integer
    */
-  progress = 50;
+  progress = 0;
 
   /**
    * Files that the user selected and wants to transfer
@@ -418,9 +423,7 @@ export default class Transfer {
       // Don't calculate if we havn't progressed since
       if (lastProgress !== this.progress) {
         const timeForOnePercent = timeSince / (this.progress - lastProgress);
-        const remainingPercentInFile = 100 - this.progress;
-        const remainingPercentInOtherFiles = (this.totalFiles - currentFileIndex - 1) * 100;
-        const percentLeft = remainingPercentInFile + remainingPercentInOtherFiles;
+        const percentLeft = 100 - this.progress;
         const currentEstimate = Math.round((percentLeft * timeForOnePercent) / 1000);
 
         // Keep estimates based on time between intervals
@@ -486,6 +489,9 @@ export default class Transfer {
           fileType: file.type
         });
         ({ size } = file);
+
+        this.currentFileName = file.name;
+        this.triggerUpdate();
 
         debug('Starting new file', file);
       }
@@ -654,6 +660,9 @@ export default class Transfer {
         setFiles(data.num);
       } else if (data.type === 'new file') {
         currentFile = data;
+        
+        this.currentFileName = data.name;
+        this.triggerUpdate();
       } else if (data.type === 'new file part') {
         addFileChunk(data.part);
       } else if (data.type === 'file complete') {
