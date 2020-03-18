@@ -306,7 +306,7 @@ export default class Transfer {
 
       if (this.isSender) {
         this.lockTransfer();
-        
+
         // Automatically open file selection popup
         setTimeout(() => {
           document.querySelector('input[type=file]').click();
@@ -660,7 +660,7 @@ export default class Transfer {
         setFiles(data.num);
       } else if (data.type === 'new file') {
         currentFile = data;
-        
+
         this.currentFileName = data.name;
         this.triggerUpdate();
       } else if (data.type === 'new file part') {

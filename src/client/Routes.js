@@ -48,6 +48,10 @@ const Routes = ({ location }) => {
     openPage('/');
   };
 
+  history.listen(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
   return (
     <TransitionGroup>
       <CSSTransition
