@@ -246,7 +246,27 @@ export default class Transfer {
   connectPeers() {
     debug('Connecting peers');
 
+    const openFileSelect = () => {
+      this.openPage('/select-file');
+
+      if (this.isSender) {
+        this.lockTransfer();
+
+        // Automatically open file selection popup
+        setTimeout(() => {
+          document.querySelector('input[type=file]').click();
+        }, 500);
+      }
+    };
+
     if (this.method === 'webrtc') {
+      // Helper: Fallback to socket connection if WebRTC fails
+      const fallbackToSockets = () => {
+        this.method = 'socket';
+        this.socket.emit('set transfer method', 'socket', this.receiverId);
+        openFileSelect();
+      }
+
       // Setup our own WebRTC Peer
       this.peer = new SimplePeer({
         initiator: this.isSender,
@@ -266,9 +286,7 @@ export default class Transfer {
         abortConnection = setTimeout(() => {
           if (window.type === 'down') {
             debug('Peer connection timed out, using sockets instead');
-            this.method = 'socket';
-
-            this.socket.emit('set transfer method', 'socket', this.receiverId);
+            fallbackToSockets();
           }
         }, 3000);
 
@@ -280,38 +298,19 @@ export default class Transfer {
         debug('Connected to peer');
 
         clearTimeout(abortConnection);
-        this.openPage('/select-file');
-
-        if (this.isSender) {
-          this.lockTransfer();
-
-          // Automatically open file selection popup
-          setTimeout(() => {
-            document.querySelector('input[type=file]').click();
-          }, 500);
-        }
+        openFileSelect();
       });
       // There was an error while connecting to the other peer
       // Probably a problem with the network so fall back to using sockets instead
       this.peer.on('error', (err) => {
         debug('Got error while connecting WebRTC', err);
 
-        // Fallback to socket
-        this.method = 'socket';
+        fallbackToSockets();
       });
     } else {
       // Transfer method is sockets
       // We are already connected over sockets - simply continue
-      this.openPage('/select-file');
-
-      if (this.isSender) {
-        this.lockTransfer();
-
-        // Automatically open file selection popup
-        setTimeout(() => {
-          document.querySelector('input[type=file]').click();
-        }, 500);
-      }
+      openFileSelect();
     }
   }
 
