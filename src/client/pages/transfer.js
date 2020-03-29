@@ -28,8 +28,14 @@ const Transfer = ({ transfer }) => (
         percent={transfer.progress}
         strokeWidth={20}
         strokeColor="#8641D4"
+        strokeLinecap="butt"
         trailWidth={20}
         trailColor="#FFFFFF"
+        style={{
+          height: '3rem',
+          width: '100%',
+          borderRadius: 15,
+        }}
       />
       <h2>Transferring files...</h2>
       <p style={{ color: '#B4B4B4', lineHeight: 2 }}>
