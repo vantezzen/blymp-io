@@ -9,6 +9,8 @@ import Section from '../components/Section';
 import Spacer from '../components/Spacer';
 import Transfer from '../classes/Transfer';
 
+import './home.css';
+
 const Home = ({ transfer }) => (
   <div>
     <Heading fullSize />
@@ -31,78 +33,85 @@ const Home = ({ transfer }) => (
       </>
     )}
 
-    <Section>
-      <h2>Send</h2>
-      <p>
-        By entering a receiver code you accept
-        <br />
-        our
-        {' '}
-        <Link to="/terms" style={{ color: '#FFFFFF' }}>
-          Terms of Use
-        </Link>
-        {' and '}
-        <Link to="/privacy" style={{ color: '#FFFFFF' }}>
-          Privacy Policy
-        </Link>
-        .
-      </p>
+    <div className="home-sections">
+      <Section>
+        <h2>Receive</h2>
 
-      <CodeInput
-        type="number"
-        fields={4}
-        className="code-input"
-        autoFocus
-        onChange={id => transfer.useReceiver(id)}
-        inputStyleInvalid={{
-          animation: 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both',
-        }}
-        isValid={transfer.isValidId}
-      />
+        { transfer.receiverId ? (
+          <CodeInput
+            type="number"
+            fields={4}
+            className="code-input"
+            value={transfer.receiverId ? String(transfer.receiverId) : ''}
+            disabled
+          />
+        ) : (
+          <div>
+            Loading...
+          </div>
+        )}
 
-      <p>Enter a receiver code to send a file</p>
-    </Section>
+        <p>
+          Give this code to another person
+          <br />
+          in order to receive a file from them
+        </p>
 
-    <Spacer size="3rem" />
+        <p className="small-info">
+          By using blymp.io you accept
+          <br />
+          our
+          {' '}
+          <Link to="/terms" style={{ color: '#FFFFFF' }}>
+            Terms of Use
+          </Link>
+          {' and '}
+          <Link to="/privacy" style={{ color: '#FFFFFF' }}>
+            Privacy Policy
+          </Link>
+          .
+        </p>
+      </Section>
 
-    <Section>
-      <h2>Receive</h2>
+      <Spacer size="3rem" />
 
-      <p>
-        By using blymp.io you accept
-        <br />
-        our
-        {' '}
-        <Link to="/terms" style={{ color: '#FFFFFF' }}>
-          Terms of Use
-        </Link>
-        {' and '}
-        <Link to="/privacy" style={{ color: '#FFFFFF' }}>
-          Privacy Policy
-        </Link>
-        .
-      </p>
+      <Section>
+        <h2>Send</h2>
 
-      { transfer.receiverId ? (
         <CodeInput
           type="number"
           fields={4}
           className="code-input"
-          value={transfer.receiverId ? String(transfer.receiverId) : ''}
-          disabled
+          autoFocus
+          onChange={id => transfer.useReceiver(id)}
+          inputStyleInvalid={{
+            animation: 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both',
+          }}
+          isValid={transfer.isValidId}
         />
-      ) : (
-        <div>
-          Loading...
-        </div>
-      )}
 
-      <p>
-        Give this code to the sender
-        <br />
-        in order to receive a file
-      </p>
-    </Section>
+        <p>
+          Enter the code given to your by
+          <br />
+          the receiver to send a file to them
+        </p>
+
+        <p className="small-info">
+          By entering a receiver code you accept
+          <br />
+          our
+          {' '}
+          <Link to="/terms" style={{ color: '#FFFFFF' }}>
+            Terms of Use
+          </Link>
+          {' and '}
+          <Link to="/privacy" style={{ color: '#FFFFFF' }}>
+            Privacy Policy
+          </Link>
+          .
+        </p>
+      </Section>
+    </div>
   </div>
 );
 

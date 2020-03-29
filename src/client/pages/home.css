@@ -1,0 +1,10 @@
+@media(min-width: 750px) {
+  .home-sections {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+  }
+  .home-sections .section-container:first-of-type {
+    margin-right: 2rem;
+  }
+}  

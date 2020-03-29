@@ -53,6 +53,11 @@ body {
   justify-content: center;
 }
 
+.small-info {
+  font-size: 12px;
+  color: #717171;
+}
+
 /* Code input */
 .code-input input:last-child {
   margin-right: 0 !important;
