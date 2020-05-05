@@ -43,8 +43,16 @@ module.exports = function setupSockets(io) {
   io.on('connection', (socket) => {
     debug('New connection');
 
+    let socketInCooldown = false;
+    let numFailedConnections = 0;
+    let isShadowBanned = false;
+
     // Generate new receiver ID
     socket.on('new receiver id', (method, callback) => {
+      if (isShadowBanned) {
+        return;
+      }
+
       // Make sure the socket doesn't already have an active transfer
       const activeTransfer = Object.values(transfers).find(e => e.receiver === socket.id);
       if (activeTransfer && activeTransfer.code) {
@@ -65,6 +73,10 @@ module.exports = function setupSockets(io) {
 
     // Set peer signal and send to partner
     socket.on('set peer signal', (peerSignal, id, isSender) => {
+      if (isShadowBanned) {
+        return;
+      }
+
       if (!id) return;
       if (!transfers[id]) return;
 
@@ -86,9 +98,18 @@ module.exports = function setupSockets(io) {
 
     // Trying to use receiver id for transfer
     socket.on('use receiver id', (id, method, callback) => {
+      // Cooldown to prevent brute-forcing
+      if (socketInCooldown || isShadowBanned) {
+        debug('Socket tried to use Socket ID but is in cooldown or shadow ban');
+        callback(false, '');
+        numFailedConnections += 1;
+        return;
+      }
+
       if (!id) return;
 
-      if (transfers[id]) {
+      // Check if receiver ID exists and user is not shadow-banned
+      if (transfers[id] && !isShadowBanned) {
         const transfer = transfers[id];
         // Check that there isn't a sender yet
         if (transfer.sender !== false) {
@@ -113,6 +134,21 @@ module.exports = function setupSockets(io) {
         io.to(transfers[id].receiver).emit('pair partner found', transfers[id].method);
         callback(true, transfers[id].method);
       } else {
+        // Track failed connections
+        if (!isShadowBanned) {
+          debug(`Putting user in cooldown for ${numFailedConnections / 2} seconds`);
+          socketInCooldown = true;
+          setTimeout(() => {
+            socketInCooldown = false;
+          }, numFailedConnections * 500);
+          numFailedConnections += 1;
+
+          if (numFailedConnections > 10) {
+            debug('Shadow banned user');
+            isShadowBanned = true;
+          }
+        }
+
         callback(false, '');
       }
     });
@@ -148,14 +184,20 @@ module.exports = function setupSockets(io) {
     // After selecting an image on iOS, this allows it to reconnect to its
     // current transfer
     socket.on('reconnect', (oldSocketId, id) => {
+      if (isShadowBanned) {
+        return;
+      }
+
       if (id && transfers[id]) {
         if (oldSocketId !== socket.id) {
           debug('Client reconnecting with different socket id on', id);
 
           if (transfers[id].sender === oldSocketId) {
             transfers[id].sender = socket.id;
-          } else {
+          } else if (transfers[id].receiver === oldSocketId) {
             transfers[id].receiver = socket.id;
+          } else {
+            return;
           }
         }
 
@@ -169,6 +211,10 @@ module.exports = function setupSockets(io) {
 
     // Inform other device that a file has been selected
     socket.on('selected file', (id) => {
+      if (isShadowBanned) {
+        return;
+      }
+
       if (id && transfers[id]) {
         if (transfers[id].sender !== socket.id) return;
 
@@ -182,6 +228,10 @@ module.exports = function setupSockets(io) {
 
     // Proxy request to partner - used during file transfer
     socket.on('proxy to partner', (id, data, callback = false) => {
+      if (isShadowBanned) {
+        return;
+      }
+
       if (id && transfers[id]) {
         if (transfers[id].sender !== socket.id) return;
 
