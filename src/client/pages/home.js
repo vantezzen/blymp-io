@@ -3,11 +3,21 @@ import PropTypes from 'prop-types';
 import CodeInput from 'react-code-input';
 import { Link } from 'react-router-dom';
 import InfoCircle from 'react-ionicons/lib/IosWarningOutline';
+import Faq from 'react-faq-component';
 
 import Heading from '../components/Heading';
 import Section from '../components/Section';
 import Spacer from '../components/Spacer';
+import Separator from '../components/Separator';
+import Checktext from '../components/Checktext';
 import Transfer from '../classes/Transfer';
+
+import ConnectImg from '../assets/tutorial-connect.svg';
+import CodeImg from '../assets/tutorial-code.svg';
+import SelectImg from '../assets/tutorial-select.svg';
+import TransferImg from '../assets/tutorial-transfer.svg';
+
+import faqContent from '../assets/faq-content';
 
 import './home.css';
 
@@ -111,6 +121,92 @@ const Home = ({ transfer }) => (
           .
         </p>
       </Section>
+
+      <Spacer size="3rem" />
+
+      <Section>
+        <h2>Why blymp.io</h2>
+
+        <Checktext>
+          No registration
+        </Checktext>
+        <Checktext>
+          Privacy-oriented
+        </Checktext>
+        <Checktext>
+          Free
+        </Checktext>
+        <Checktext>
+          Open-source
+        </Checktext>
+        You can learn more about blymp.io below.
+      </Section>
+    </div>
+
+    <Separator />
+
+    <h2 id="how-it-works">How it works</h2>
+    <div className="feature">
+      <img src={ConnectImg} alt="Connect" />
+
+      <div>
+        <h3>
+          1. Open blymp.io
+        </h3>
+        <p>
+          Open blymp.io on your device you want to send files from and your device you want to receive files on.
+        </p>
+      </div>
+      
+    </div>
+
+    <div className="feature reverse">
+      <div>
+        <h3>
+          2. Exchange the code
+        </h3>
+        <p>
+          The device you want to receive files on will show a 4-digit code.<br />
+          Enter this code on the device you want to send files from.
+        </p>
+      </div>
+      
+      <img src={CodeImg} alt="Exchange the code" />
+    </div>
+
+    <div className="feature">
+      <img src={SelectImg} alt="Select files" />
+
+      <div>
+        <h3>
+          3. Select your files
+        </h3>
+        <p>
+          Select one or multiple files you want to transfer.
+        </p>
+      </div>
+      
+    </div>
+
+    <div className="feature reverse">
+      <div>
+        <h3>
+          4. Transfer!
+        </h3>
+        <p>
+          Your files will be transferred with the highest speed possible.<br />
+          If your devices support it, all files will be transferred Peer-to-Peer - so that they don't even have to pass our servers.
+        </p>
+      </div>
+      
+      <img src={TransferImg} alt="Transfer files" />
+    </div>
+
+    <h2>FAQ</h2>
+    <div className="faq-area-container">
+      <div className="faq-area">
+        <Faq data={faqContent} />
+      </div>
     </div>
   </div>
 );

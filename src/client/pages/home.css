@@ -4,7 +4,70 @@
     width: 100%;
     justify-content: center;
   }
-  .home-sections .section-container:first-of-type {
-    margin-right: 2rem;
+  .home-sections .section-container {
+    margin-left: 2rem;
   }
-}  
+  .home-sections .section-container:first-of-type {
+    margin-left: 0;
+  }
+
+  .feature {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    text-align: left;
+    align-items: center;
+    margin: 0 10%;
+  }
+  .feature.reverse {
+    text-align: right;
+    display: grid !important;
+  }
+  .feature img {
+    justify-self: center;
+  }
+  /* .feature h3 {
+    text-align: center;
+  } */
+
+  .faq-area {
+    width: 60vw !important;
+  }
+}
+a {
+  color: #FFFFFF;
+}
+.feature {
+  margin-top: 4rem;
+}
+.feature img {
+  height: 150px;
+}
+.feature.reverse {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.faq-area-container {
+  display: flex;
+  justify-content: center;
+}
+.faq-area {
+  width: 80vw;
+
+  --faq-bg-color: transparent;
+  --row-title-color: white;
+  --row-content-color: white;
+  --arrow-color: white;
+}
+.faq-area > div > section > section > div:first-of-type {
+  /* FAQ Area Heading */
+  font-size: 1.2em;
+}
+.faq-area > div > section > section > div:nth-child(2) {
+  /* FAQ Area Content */
+  text-align: left;
+  margin: 1em;
+}
+.faq-area a {
+  color: #FFFFFF;
+}
