@@ -1,9 +1,11 @@
+import bmcLogo from '../assets/bmc.png';
+
 const faqContent = {
   title: "",
   rows: [
     {
       title: "How is this free? Do you sell my data?",
-      content: "blymp.io can be used for free because of its underlying architecture:<br />blymp.io tries to transfer files using a peer-to-peer connection, meaning no server needs to be used. Due to this, the hosting for blymp.io is practically free for me, so I can also offer it for free.<br /><br />Even though its free, blymp.io does not save or sell your data!"
+      content: "blymp.io can be used for free because of its underlying architecture:<br />blymp.io tries to transfer files using a peer-to-peer connection, meaning no server needs to be used. Due to this, the hosting for blymp.io is fairly cheep for me, so I can also offer it for free.<br /><br />Even though its free, blymp.io does not save or sell your data!<br /><br />If you'd like to support blymp.io and help keep the service running, please consider donating:<br /><br /><a href=\"https://www.buymeacoffee.com/vantezzen\" target=\"_blank\"><img src=\"" + bmcLogo + "\" alt=\"Buy Me A Coffee\" width=\"150\" /></a>"
     },
     {
       title: "How fast will the files be transferred?",

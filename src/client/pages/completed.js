@@ -4,6 +4,7 @@ import Check from 'react-ionicons/lib/IosCheckmark';
 
 import Heading from '../components/Heading';
 import Section from '../components/Section';
+import bmcLogo from '../assets/bmc.png';
 
 const Completed = ({ newTransfer }) => (
   <div>
@@ -21,6 +22,10 @@ const Completed = ({ newTransfer }) => (
         Thank you for using blymp.io for transferring files.
       </p>
       <p>Do you like blymp.io? Why not tell your friends about it?</p>
+      <p>Also, if you really like blymp.io, please consider donating so I can keep this service alive:</p>
+      <a href="https://www.buymeacoffee.com/vantezzen" target="_blank">
+        <img src={bmcLogo} alt="Buy Me A Coffee" width="150" />
+      </a>
 
       <button onClick={newTransfer} type="button">
         Start new transfer
