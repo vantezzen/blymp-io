@@ -1,14 +1,19 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
+const WorkboxPlugin = require('workbox-webpack-plugin');
 
 const outputDirectory = 'dist';
 
 module.exports = {
-  entry: ['babel-polyfill', './src/client/index.js'],
+  entry: {
+    bundle: ['babel-polyfill', './src/client/index.js'],
+    worker: "./src/client/worker.js"
+  },
   output: {
     path: path.join(__dirname, outputDirectory),
-    filename: 'bundle.js'
+    filename: '[name].js'
   },
   module: {
     rules: [{
@@ -40,8 +45,34 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin([outputDirectory]),
+    new CopyPlugin({
+      patterns: [
+        { 
+          from: "public",
+          globOptions: {
+            ignore: [
+              // Ignore all `html` files
+              "**/*.html",
+            ],
+          },
+        },
+      ],
+    }),
+    new WorkboxPlugin.InjectManifest({
+      swSrc: path.join(process.cwd(), '/src/client/worker.js'),
+      swDest: 'worker.js',
+      exclude: [
+        /\.map$/,
+        /manifest$/,
+        /\.htaccess$/,
+        /service-worker\.js$/,
+        /sw\.js$/,
+        /\.DS_Store$/,
+      ],
+    }),
     new HtmlWebpackPlugin({
       template: './public/index.html',
+      chunks: ["bundle"],
       favicon: './public/favicon.ico'
     })
   ]
