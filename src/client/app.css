@@ -74,6 +74,7 @@ body {
   background-color: #574d70 !important;
   color: #FFFFFF !important;
   outline: none;
+  -moz-appearance: textfield;
 }
 .code-input input::-webkit-outer-spin-button,
 .code-input input::-webkit-inner-spin-button {
