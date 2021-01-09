@@ -1,10 +1,8 @@
 /* eslint-disable no-restricted-globals */
 import { clientsClaim } from 'workbox-core';
-import { ExpirationPlugin } from 'workbox-expiration';
-import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
+import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst } from 'workbox-strategies';
-import { StaleWhileRevalidate } from 'workbox-strategies';
 
 clientsClaim();
 
@@ -13,17 +11,58 @@ clientsClaim();
 // This variable must be present somewhere in your service worker file,
 // even if you decide not to use precaching. See https://cra.link/PWA
 const manifest = self.__WB_MANIFEST;
-// console.log(manifest)
 precacheAndRoute(manifest);
 
-// Cache icons
+// Cache all images
 registerRoute(
   ({ url }) => url.origin === self.location.origin && url.pathname.endsWith('.png'), // Customize this strategy as needed, e.g., by changing to CacheFirst.
   new CacheFirst()
 );
 
+// React to messages
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
 });
+
+// Share target handler
+const shareTargetHandler = async ({event}) => {
+  console.log('Handling share event');
+
+  const formData = await event.request.formData();
+  const mediaFiles = formData.getAll('media');
+  const cache = await caches.open('media');
+
+  for (const mediaFile of mediaFiles) {
+    // TODO: Instead of bailing, come up with a
+    // default name for each possible MIME type.
+    if (!mediaFile.name) {
+      if (broadcastChannel) {
+        broadcastChannel.postMessage('Sorry! No name found on incoming media.');
+      }
+      continue;
+    }
+
+    const cacheKey = new URL(`/_media/${Date.now()}-${mediaFile.name}`, self.location).href;
+    await cache.put(
+      cacheKey,
+      new Response(mediaFile, {
+        headers: {
+          'content-length': mediaFile.size,
+          'content-type': mediaFile.type,
+        },
+      })
+    );
+
+    console.log(`Put "${mediaFile.name} into cache at ${cacheKey}"`);
+  }
+
+  // Redirect to the page
+  return Response.redirect('/#share', 303);
+};
+registerRoute(
+  '/_share',
+  shareTargetHandler,
+  'POST'
+);
