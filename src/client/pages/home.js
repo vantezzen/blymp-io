@@ -1,11 +1,7 @@
-import React from 'react';
+import React, {Suspense} from 'react';
 import PropTypes from 'prop-types';
-import CodeInput from 'react-code-input';
 import { Link } from 'react-router-dom';
-import InfoCircle from 'react-ionicons/lib/IosWarningOutline';
-import Faq from 'react-faq-component';
 
-import Heading from '../components/Heading';
 import Section from '../components/Section';
 import Spacer from '../components/Spacer';
 import Separator from '../components/Separator';
@@ -21,14 +17,23 @@ import faqContent from '../assets/faq-content';
 
 import './home.css';
 
+const Heading = React.lazy(() => import('../components/Heading'));
+const InfoCircle = React.lazy(() => import('react-ionicons/lib/IosWarningOutline'));
+const CodeInput = React.lazy(() => import('react-code-input'));
+const Faq = React.lazy(() => import('react-faq-component'));
+
 const Home = ({ transfer }) => (
   <div>
-    <Heading fullSize />
+    <Suspense fallback={<div />}>
+      <Heading fullSize />
+    </Suspense>
 
     {!window.Blob && (
       <>
         <Section>
-          <InfoCircle color="#FFFFFF" fontSize="50" />
+          <Suspense fallback={<div />}>
+            <InfoCircle color="#FFFFFF" fontSize="50" />
+          </Suspense>
           <br />
           Your device does not support the technologies
           <br />
@@ -48,13 +53,15 @@ const Home = ({ transfer }) => (
         <h2>Receive</h2>
 
         { transfer.receiverId ? (
-          <CodeInput
-            type="number"
-            fields={4}
-            className="code-input"
-            value={transfer.receiverId ? String(transfer.receiverId) : ''}
-            disabled
-          />
+          <Suspense fallback={<div />}>
+            <CodeInput
+              type="number"
+              fields={4}
+              className="code-input"
+              value={transfer.receiverId ? String(transfer.receiverId) : ''}
+              disabled
+            />
+          </Suspense>
         ) : (
           <div>
             Loading...
@@ -88,17 +95,19 @@ const Home = ({ transfer }) => (
       <Section>
         <h2>Send</h2>
 
-        <CodeInput
-          type="number"
-          fields={4}
-          className="code-input"
-          autoFocus
-          onChange={id => transfer.useReceiver(id)}
-          inputStyleInvalid={{
-            animation: 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both',
-          }}
-          isValid={transfer.isValidId}
-        />
+        <Suspense fallback={<div />}>
+          <CodeInput
+            type="number"
+            fields={4}
+            className="code-input"
+            autoFocus
+            onChange={id => transfer.useReceiver(id)}
+            inputStyleInvalid={{
+              animation: 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both',
+            }}
+            isValid={transfer.isValidId}
+          />
+        </Suspense>
 
         <p>
           Enter the code given to your by
@@ -205,7 +214,9 @@ const Home = ({ transfer }) => (
     <h2>FAQ</h2>
     <div className="faq-area-container">
       <div className="faq-area">
-        <Faq data={faqContent} />
+        <Suspense fallback={<div />}>
+          <Faq data={faqContent} />
+        </Suspense>
       </div>
     </div>
   </div>

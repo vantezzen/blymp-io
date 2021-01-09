@@ -9,7 +9,7 @@ const outputDirectory = 'dist';
 module.exports = {
   entry: {
     main: ['babel-polyfill', './src/client/index.js'],
-    worker: "./src/client/worker.js"
+    worker: ['babel-polyfill', "./src/client/worker.js"]
   },
   output: {
     path: path.join(__dirname, outputDirectory),
