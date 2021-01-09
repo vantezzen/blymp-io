@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import {
   Switch,
@@ -15,16 +15,16 @@ import './app.css';
 
 import Transfer from './classes/Transfer';
 
-import Home from './pages/home';
-import Connecting from './pages/connecting';
-import SelectFile from './pages/select-file';
-import TransferPage from './pages/transfer';
-import Completed from './pages/completed';
-import Disconnected from './pages/disconected';
-import Terms from './pages/legal/terms';
-import Privacy from './pages/legal/privacy';
-import Imprint from './pages/legal/imprint';
-import Compatibility from './pages/compatibility';
+const Home = React.lazy(() => import('./pages/home'));
+const Connecting = React.lazy(() => import('./pages/connecting'));
+const SelectFile = React.lazy(() => import('./pages/select-file'));
+const TransferPage = React.lazy(() => import('./pages/transfer'));
+const Completed = React.lazy(() => import('./pages/completed'));
+const Disconnected = React.lazy(() => import('./pages/disconected'));
+const Terms = React.lazy(() => import('./pages/legal/terms'));
+const Privacy = React.lazy(() => import('./pages/legal/privacy'));
+const Imprint = React.lazy(() => import('./pages/legal/imprint'));
+const Compatibility = React.lazy(() => import('./pages/compatibility'));
 
 const defaultTransfer = new Transfer();
 
@@ -61,34 +61,54 @@ const Routes = ({ location }) => {
       >
         <Switch location={location}>
           <Route path="/connecting">
-            <Connecting />
+            <Suspense fallback={<div>Loading...</div>}>
+              <Connecting />
+            </Suspense>
           </Route>
           <Route path="/select-file">
-            <SelectFile transfer={transfer} />
+            <Suspense fallback={<div>Loading...</div>}>
+              <SelectFile transfer={transfer} />
+            </Suspense>
           </Route>
           <Route path="/transfer">
-            <TransferPage transfer={transfer} />
+            <Suspense fallback={<div>Loading...</div>}>
+              <TransferPage transfer={transfer} />
+            </Suspense>
           </Route>
           <Route path="/completed">
-            <Completed newTransfer={() => newTransfer()} />
+            <Suspense fallback={<div>Loading...</div>}>
+              <Completed newTransfer={() => newTransfer()} />
+            </Suspense>
           </Route>
           <Route path="/disconnected">
-            <Disconnected newTransfer={() => newTransfer()} />
+            <Suspense fallback={<div>Loading...</div>}>
+              <Disconnected newTransfer={() => newTransfer()} />
+            </Suspense>
           </Route>
           <Route path="/privacy">
-            <Privacy />
+            <Suspense fallback={<div>Loading...</div>}>
+              <Privacy />
+            </Suspense>
           </Route>
           <Route path="/terms">
-            <Terms />
+            <Suspense fallback={<div>Loading...</div>}>
+              <Terms />
+            </Suspense>
           </Route>
           <Route path="/imprint">
-            <Imprint />
+            <Suspense fallback={<div>Loading...</div>}>
+              <Imprint />
+            </Suspense>
           </Route>
           <Route path="/compatibility">
-            <Compatibility />
+            <Suspense fallback={<div>Loading...</div>}>
+              <Compatibility />
+            </Suspense>
           </Route>
           <Route path="/">
-            <Home transfer={transfer} />
+            <Suspense fallback={<div>Loading...</div>}>
+              <Home transfer={transfer} />
+            </Suspense>
           </Route>
         </Switch>
       </CSSTransition>

@@ -8,12 +8,13 @@ const outputDirectory = 'dist';
 
 module.exports = {
   entry: {
-    bundle: ['babel-polyfill', './src/client/index.js'],
+    main: ['babel-polyfill', './src/client/index.js'],
     worker: "./src/client/worker.js"
   },
   output: {
     path: path.join(__dirname, outputDirectory),
-    filename: '[name].js'
+    filename: '[name].js',
+    chunkFilename: '[name].bundle.js',
   },
   module: {
     rules: [{
@@ -72,7 +73,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: './public/index.html',
-      chunks: ["bundle"],
+      chunks: ["main"],
       favicon: './public/favicon.ico'
     })
   ]

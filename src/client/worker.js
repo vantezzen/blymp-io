@@ -12,7 +12,9 @@ clientsClaim();
 // Their URLs are injected into the manifest variable below.
 // This variable must be present somewhere in your service worker file,
 // even if you decide not to use precaching. See https://cra.link/PWA
-precacheAndRoute(self.__WB_MANIFEST);
+const manifest = self.__WB_MANIFEST;
+// console.log(manifest)
+precacheAndRoute(manifest);
 
 // Cache icons
 registerRoute(

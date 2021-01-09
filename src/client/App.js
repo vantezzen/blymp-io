@@ -6,7 +6,6 @@ import '@openfonts/gothic-a1_latin';
 import './app.css';
 
 import Routes from './Routes';
-
 import Footer from './components/Footer';
 
 const App = () => (
