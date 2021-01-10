@@ -34,6 +34,8 @@ const shareTargetHandler = async ({event}) => {
   const mediaFiles = formData.getAll('media');
   const cache = await caches.open('media');
 
+  console.log('Got mediafiles', mediaFiles);
+
   for (const mediaFile of mediaFiles) {
     // TODO: Instead of bailing, come up with a
     // default name for each possible MIME type.
@@ -57,6 +59,8 @@ const shareTargetHandler = async ({event}) => {
 
     console.log(`Put "${mediaFile.name} into cache at ${cacheKey}"`);
   }
+
+  console.log('Redirecting to page');
 
   // Redirect to the page
   return Response.redirect('/#share', 303);
