@@ -5,6 +5,7 @@ import SimplePeer from 'simple-peer';
 import socket from 'socket.io-client';
 import { saveAs } from 'file-saver';
 import debugging from 'debug';
+import analytics from '../analytics';
 
 const debug = debugging('blymp:transfer');
 
@@ -128,6 +129,7 @@ export default class Transfer {
     // Someone entered our receiver ID
     this.socket.on('pair partner found', (method) => {
       debug('Found a pair partner', method);
+      analytics("found-partner");
 
       this.openPage('/connecting');
 
@@ -156,12 +158,14 @@ export default class Transfer {
     // Our partner has successfully selected a file and confirmed the action
     this.socket.on('partner selected file', () => {
       this.openPage('/transfer');
+      analytics("partner-selected-file");
       this.downloadFiles();
     });
 
     // Partner disconnected from our transfer
     this.socket.on('partner disconnected', () => {
       debug('Partner disconnected from this transfer');
+      analytics("partner-disconnected");
       if (!this.finishedTransfer) {
         this.openPage('/disconnected');
       }
@@ -183,6 +187,7 @@ export default class Transfer {
     // Ask socket server to give us a new receiver ID
     this.socket.emit('new receiver id', this.method, (id) => {
       debug('Received own ID', id);
+      analytics("generated-id");
 
       this.receiverId = id;
 
@@ -205,6 +210,7 @@ export default class Transfer {
     if (Number(id) === this.receiverId) {
       this.isValidId = false;
       this.triggerUpdate();
+      analytics("connected-to-self");
       return;
     }
 
@@ -213,6 +219,7 @@ export default class Transfer {
       if (response === true) {
         // Server informed us that the other peer is valid and listening
         debug('Is valid ID, using', id, method);
+        analytics("entered-valid-id");
 
         this.isSender = true;
         this.receiverId = id;
@@ -222,6 +229,7 @@ export default class Transfer {
 
         this.connectPeers();
       } else {
+        analytics("entered-invalid-id");
         this.isValidId = false;
         this.triggerUpdate();
         debug('Invalid ID');
@@ -330,6 +338,8 @@ export default class Transfer {
   uploadFiles() {
     // List of last estimates, so we can calculate a more stable estimate
     let lastEstimates = [];
+
+    analytics("start-upload");
 
     // Helper method to easily emit new data
     const emit = (data, isFilePart = false, callback = false) => {
@@ -580,6 +590,8 @@ export default class Transfer {
     let filesLeft = 1;
     let filesAvailible = 1;
     let currentFile;
+
+    analytics("start-download");
 
     // Set number of files being transferred
     const setFiles = (files) => {
