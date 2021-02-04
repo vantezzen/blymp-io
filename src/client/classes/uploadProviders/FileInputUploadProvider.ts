@@ -40,6 +40,11 @@ export default class FileInputUploadProvider implements UploadProvider {
     };
   }
 
+  prepareFile(_: number): Promise<void> {
+    // This provider doesn't need to do any preperations
+    return Promise.resolve();
+  }
+
   getFileSlice(index: number, start: number, end: number) : Promise<ArrayBuffer | string> {
     if (this.currentResolver !== undefined) {
       throw new Error('Internal error: Tried to start new read operation before current read finished');

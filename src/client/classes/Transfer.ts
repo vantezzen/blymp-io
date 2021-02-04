@@ -1,15 +1,13 @@
 /**
  * Transfer: Stores and manages all information about the current transfer
  */
-import SimplePeer, { SimplePeerData } from 'simple-peer';
+import SimplePeer from 'simple-peer';
 import socket from 'socket.io-client';
-import { saveAs } from 'file-saver';
 import debugging from 'debug';
 import analytics from '../analytics';
-import { BufferLike, TransferControlMessage, TransferFile } from '../types';
 import UploadProvider from './uploadProviders/UploadProvider';
-import DownloadProcessor from './downloadProcessors/DownloadProcessor';
-import DefaultProcessor from './downloadProcessors/DefaultProcessor';
+import UploadService from './UploadService';
+import DownloadService from './DownloadService';
 
 const debug = debugging('blymp:transfer');
 
@@ -350,68 +348,7 @@ export default class Transfer {
       throw new Error('Internal error: Cannot upload data as no upload provider was set');
     }
 
-    // List of last estimates, so we can calculate a more stable estimate
-    let lastEstimates : number[] = [];
-
     analytics("start-upload");
-
-    // Helper method to easily emit new data
-    const emit = (data: String | ArrayBuffer | Object, isFilePart = false, callback : false | Function = false) => {
-      if (this.method === 'webrtc') {
-        if (!this.peer) {
-          throw new Error('Internal error: Cannot send data as no peer is connected');
-        }
-
-        if (isFilePart) {
-          try {
-            this.peer.send(data as SimplePeerData);
-          } catch (e) {
-            debug('Peer connection has been reset - falling back to sockets');
-
-            // Switching methods will change the transfer speed
-            // Delete current estimates to get a more accurate one
-            lastEstimates = [];
-            this.method = 'socket';
-            this.socket.emit('proxy to partner', this.receiverId, {
-              type: 'use transfer method',
-              method: 'socket'
-            });
-            emit(data, isFilePart, callback);
-            return;
-          }
-        } else {
-          try {
-            this.peer.send(JSON.stringify(data));
-          } catch (e) {
-            debug('Peer connection has been reset - falling back to sockets');
-
-            // Switching methods will change the transfer speed
-            // Delete current estimates to get a more accurate one
-            lastEstimates = [];
-            this.method = 'socket';
-            this.socket.emit('proxy to partner', this.receiverId, {
-              type: 'use transfer method',
-              method: 'socket'
-            });
-            emit(data, isFilePart, callback);
-            return;
-          }
-        }
-        if (callback) {
-          callback();
-        }
-      } else if (isFilePart) {
-        this.socket.emit('proxy to partner', this.receiverId, `###${data}`, callback);
-      } else {
-        this.socket.emit('proxy to partner', this.receiverId, data);
-        if (callback) {
-          callback();
-        }
-      }
-    };
-
-    // Chunk size is 15kb for WebRTC, 512kb for sockets
-    const chunkSize = this.method === 'webrtc' ? 1024 * 15 : 1024 * 512;
 
     // Reconnect to current transfer if disconnected
     // See comment under "this.lockTransfer"
@@ -420,322 +357,22 @@ export default class Transfer {
     // Inform partner that we have selected a file and will begin transfer
     this.socket.emit('selected file', this.receiverId);
 
-    // Inform partner which DownloadProcessor they should use
-    emit({
-      type: 'use processor',
-      processor: this.uploadProvider.getDownloadProcessor()
-    });
-
+    // Open the transfer page that shows the current status of the transfer
     this.openPage('/transfer');
 
-    /////////////////////////////////////////////
-    // Inform partner about number of files
-    emit({
-      type: 'number of files',
-      num: this.uploadProvider.getNumberOfFiles()
-    });
-
-    // Current file index in file event array we are transferring
-    let currentFileIndex = 0;
-
-    // Total number of files we need to transfer
-    this.totalFiles = this.uploadProvider.getNumberOfFiles();
-
-    // Status about the current file
-    let size: number;
-    let transmitted = 0;
-    this.progress = 0;
-
-    // Variables needed to calculate the estimate
-    let lastProgress = 0;
-    let timeSince = 50;
-
-    this.triggerUpdate();
-
-    // Calculate an estimate every 50ms
-    const estimateInterval = setInterval(() => {
-      // Don't calculate if we havn't progressed since
-      if (lastProgress !== this.progress) {
-        const timeForOnePercent = timeSince / (this.progress - lastProgress);
-        const percentLeft = 100 - this.progress;
-        const currentEstimate = Math.round((percentLeft * timeForOnePercent) / 1000);
-
-        // Keep estimates based on time between intervals
-        lastEstimates.push(currentEstimate);
-
-        // Helper function that scales numbers to another range
-        // Like arduino "map" function
-        // eslint-disable-next-line max-len
-        const scale = (num: number, inMin: number, inMax: number, outMin: number, outMax: number) => (num - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
-
-        // Number of estimates we should keep
-        const keepEstimates = scale(timeSince, 50, 1000, 50, 5);
-        // Remove excess estimates
-        while (lastEstimates.length > keepEstimates) {
-          lastEstimates.shift();
-        }
-
-        // Normalize estimates
-        let estimate = 0;
-        // eslint-disable-next-line no-restricted-syntax
-        for (const es of lastEstimates) {
-          estimate += es;
-        }
-        estimate /= lastEstimates.length;
-        estimate -= scale(lastEstimates.length, 5, 50, 0.5, 2);
-        estimate = Math.round(estimate);
-
-        if (estimate < 0) {
-          estimate = 0;
-        }
-
-        // Inform partner about our new estimate
-        emit({
-          type: 'time estimate',
-          estimate,
-        });
-
-        this.estimate = estimate;
-        this.triggerUpdate();
-
-        lastProgress = this.progress;
-        timeSince = 50;
-      } else {
-        timeSince += 50;
-      }
-    }, 50);
-
-    // Send part of a file
-    const sendFileData = (position: number, currentFile: number) => {
-      if (!this.uploadProvider) {
-        throw new Error('Internal error: Cannot upload files as no files were selected');
-      }
-      
-      // `currentFile` is 0 based but this.currentFile is 1 based so we need to add 1
-      this.currentFile = currentFile + 1;
-      this.triggerUpdate();
-
-      const fileInfo = this.uploadProvider.getFileInfo(currentFile);
-
-      if (position === 0) {
-        // We are at the beginning of the file - no data has been sent yet
-        // Send file information to partner
-        
-        emit({
-          type: 'new file',
-          ...fileInfo
-        });
-        ({ size } = fileInfo);
-
-        this.currentFileName = fileInfo.name;
-        this.triggerUpdate();
-
-        debug('Starting new file', fileInfo);
-      }
-
-      // Read and handle the chunk
-      const start = position * chunkSize;
-      const end = start + Math.min(chunkSize, (fileInfo.size - start));
-      this.uploadProvider.getFileSlice(currentFile, start, end).then((value : string | ArrayBuffer) => {
-        let data : String | ArrayBuffer = '';
-
-        if (this.method === 'socket') {
-          // Convert ArrayBuffer to string as we cannot send ArrayBuffers over socket.io
-          const uintArray = new Uint8Array(value as ArrayBuffer);
-          uintArray.forEach((byte) => {
-            data += String.fromCharCode(byte);
-          });
-        } else if (this.method === 'webrtc') {
-          // WebRTC can send ArrayBuffers so we don't need to convert
-          data = value;
-        }
-
-        // Send file chunk to partner
-        emit(data, true, () => {
-          transmitted += chunkSize;
-
-          // Check if file transmitted completely
-          if (transmitted >= size) {
-            debug('Completed transfer of file', currentFileIndex);
-            transmitted = 0;
-            currentFileIndex += 1;
-
-            // Inform partner that file is complete
-            emit({
-              type: 'file complete',
-            });
-
-            // Check if all files have been transmitted
-            if (currentFileIndex >= this.totalFiles) {
-              // Finish transfer
-              debug('Finished transferring all files');
-              this.finishedTransfer = true;
-
-              this.openPage('/completed');
-
-              clearInterval(estimateInterval);
-
-              return;
-            }
-            debug('Transferring next file', currentFileIndex, this.totalFiles);
-          }
-
-          // Calculate progress
-          this.progress = (transmitted / size) * 100;
-          emit({
-            type: 'upload progress',
-            progress: this.progress,
-          });
-
-          this.triggerUpdate();
-
-          // Get next package
-          const position = transmitted / chunkSize;
-          sendFileData(position, currentFileIndex);
-        });
-      });
-    };
-
-    // Start file transfer
-    sendFileData(0, 0);
+    // The UploadService is doing all the work of actually transmitting the data
+    const service = new UploadService(this, this.uploadProvider);
+    service.startUpload();
   }
 
   /**
    * Handle downloading and saving the files
    */
   downloadFiles() {
-    let parts : Array<string | ArrayBuffer> = [];
-    let filesLeft = 1;
-    let filesAvailible = 1;
-    let currentFile : TransferFile;
-    let processor : DownloadProcessor;
-
     analytics("start-download");
 
-    // Set number of files being transferred
-    const setFiles = (files: number) => {
-      debug('Setting number of total files to', files);
-
-      filesLeft = files;
-      filesAvailible = files;
-
-      this.totalFiles = files;
-      this.currentFile = 1;
-    };
-    // Add a new part to the current file
-    const addFileChunk = (part: string | ArrayBuffer, isBuffer = false) => {
-      debug('Adding new chunk to the current file');
-
-      let buffer: ArrayBuffer;
-      if (isBuffer) {
-        // Use raw buffer
-        buffer = part as ArrayBuffer;
-      } else {
-        const p = part as string;
-        // Convert string to ArrayBuffer
-        buffer = new ArrayBuffer(p.length);
-        const bufView = new Uint8Array(buffer);
-        for (let i = 0, strLen = p.length; i < strLen; i += 1) {
-          bufView[i] = p.charCodeAt(i);
-        }
-      }
-
-      parts.push(buffer);
-    };
-    // Complete and download current file
-    const completeFile = (filename: string, type: string) => {
-      debug('Download of file completed', parts.length, filename);
-
-      // Create file from ArrayBuffers
-      let blob = new Blob(parts, { type });
-
-      if (processor) {
-        blob = processor.process(blob);
-      }
-
-      debug('Created blob from file, saving', blob.size, filename, type);
-      saveAs(blob, filename);
-
-      // Reset parts array
-      parts = [];
-
-      filesLeft -= 1;
-
-      this.currentFile = filesAvailible - filesLeft;
-      this.triggerUpdate();
-
-      if (filesLeft === 0) {
-        this.finishedTransfer = true;
-
-        this.openPage('/completed');
-      }
-    };
-
-    const handleData = (data: string | BufferLike | TransferControlMessage) => {
-      // eslint-disable-next-line no-underscore-dangle
-      if ((data as BufferLike)._isBuffer) {
-        addFileChunk((data as BufferLike).buffer, true);
-        return;
-      } if (typeof data === 'string') {
-        // Test if is file chunk
-        // File chunks always begin with '###' to indicate that
-        // they are not normal JSON data
-        if (data.substr(0, 3) === '###') {
-          const part = data.substr(3);
-          addFileChunk(part);
-          return;
-        }
-
-        // Parse JSON
-        // eslint-disable-next-line no-param-reassign
-        data = JSON.parse(data);
-      }
-
-      const message = data as TransferControlMessage;
-      if (message.type === 'number of files') {
-        setFiles(message.num as number);
-      } else if (message.type === 'new file') {
-        if (!message.name || !message.fileType) {
-          throw new Error('Internal Error: Received file is not valid');
-        }
-
-        // We already validated that message is a valid Transferfile above but Typescript
-        // doesn't correctly identify this so we need to convert to unknown first
-        currentFile = message as unknown as TransferFile;
-
-        this.currentFileName = message.name as string;
-        this.triggerUpdate();
-      } else if (message.type === 'new file part') {
-        addFileChunk(message.part as string);
-      } else if (message.type === 'file complete') {
-        completeFile(currentFile.name, currentFile.fileType);
-      } else if (message.type === 'upload progress') {
-        this.progress = message.progress as number;
-      } else if (message.type === 'time estimate') {
-        this.estimate = message.estimate as number;
-      } else if (message.type === 'use transfer method') {
-        this.method = message.method as string;
-      } else if (message.type === 'use processor') {
-        switch(message.processor) {
-          case 'DefaultProcessor':
-            processor = new DefaultProcessor();
-            break;
-          default:
-            throw new Error('Internal error: Partner requested unknown download processor: ' + message.processor);
-        }
-      }
-
-      this.triggerUpdate();
-    };
-
-    if (this.method === 'webrtc') {
-      if (!this.peer) {
-        throw new Error('Internal Error: Peer is undefined');
-      }
-      this.peer.on('data', (response: string | BufferLike | TransferControlMessage) => {
-        handleData(response);
-      });
-    }
-    this.socket.on('proxy to partner', handleData);
+    // Create a DownloadService to handle actually receiving the data
+    const service = new DownloadService(this);
+    service.startDownload();
   }
 }

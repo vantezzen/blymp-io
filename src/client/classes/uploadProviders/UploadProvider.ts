@@ -28,4 +28,12 @@ export default interface UploadProvider {
    * @param end End byte
    */
   getFileSlice(index : number, start : number, end : number) : Promise<ArrayBuffer | string>;
+
+  /**
+   * Prepare a file if necessary. If any task need to be done before a file can be sent (e.g. compressing it)
+   * this should be done in this function
+   * 
+   * @param index Index of the file
+   */
+  prepareFile(index : number) : Promise<void>;
 }
