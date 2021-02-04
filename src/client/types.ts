@@ -17,6 +17,7 @@ export type PropsWithTransfer = {
 
 export type TransferFile = {
   name: string,
+  size: number,
   fileType: string,
   [key: string]: string | number,
 }

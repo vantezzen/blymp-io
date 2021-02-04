@@ -7,6 +7,9 @@ import { saveAs } from 'file-saver';
 import debugging from 'debug';
 import analytics from '../analytics';
 import { BufferLike, TransferControlMessage, TransferFile } from '../types';
+import UploadProvider from './uploadProviders/UploadProvider';
+import DownloadProcessor from './downloadProcessors/DownloadProcessor';
+import DefaultProcessor from './downloadProcessors/DefaultProcessor';
 
 const debug = debugging('blymp:transfer');
 
@@ -110,10 +113,9 @@ export default class Transfer {
   progress: number = 0;
 
   /**
-   * Files that the user selected and wants to transfer
-   * @type Array
+   * UploadProvider used for uploading data
    */
-  selectedFiles: FileList | undefined;
+  uploadProvider : UploadProvider | undefined;
 
   /**
    * Initialize the socket to listen for status changes
@@ -344,8 +346,8 @@ export default class Transfer {
    * Upload the currently selected files to our partner
    */
   uploadFiles() {
-    if (!this.selectedFiles) {
-      throw new Error('Internal error: Cannot upload files as no files were selected');
+    if (!this.uploadProvider) {
+      throw new Error('Internal error: Cannot upload data as no upload provider was set');
     }
 
     // List of last estimates, so we can calculate a more stable estimate
@@ -418,19 +420,26 @@ export default class Transfer {
     // Inform partner that we have selected a file and will begin transfer
     this.socket.emit('selected file', this.receiverId);
 
+    // Inform partner which DownloadProcessor they should use
+    emit({
+      type: 'use processor',
+      processor: this.uploadProvider.getDownloadProcessor()
+    });
+
     this.openPage('/transfer');
 
+    /////////////////////////////////////////////
     // Inform partner about number of files
     emit({
       type: 'number of files',
-      num: this.selectedFiles.length
+      num: this.uploadProvider.getNumberOfFiles()
     });
 
     // Current file index in file event array we are transferring
     let currentFileIndex = 0;
 
     // Total number of files we need to transfer
-    this.totalFiles = this.selectedFiles.length;
+    this.totalFiles = this.uploadProvider.getNumberOfFiles();
 
     // Status about the current file
     let size: number;
@@ -498,7 +507,7 @@ export default class Transfer {
 
     // Send part of a file
     const sendFileData = (position: number, currentFile: number) => {
-      if (!this.selectedFiles) {
+      if (!this.uploadProvider) {
         throw new Error('Internal error: Cannot upload files as no files were selected');
       }
       
@@ -506,100 +515,84 @@ export default class Transfer {
       this.currentFile = currentFile + 1;
       this.triggerUpdate();
 
-      const file = this.selectedFiles[currentFile];
+      const fileInfo = this.uploadProvider.getFileInfo(currentFile);
 
       if (position === 0) {
         // We are at the beginning of the file - no data has been sent yet
         // Send file information to partner
+        
         emit({
           type: 'new file',
-          size: file.size,
-          name: file.name,
-          fileType: file.type
+          ...fileInfo
         });
-        ({ size } = file);
+        ({ size } = fileInfo);
 
-        this.currentFileName = file.name;
+        this.currentFileName = fileInfo.name;
         this.triggerUpdate();
 
-        debug('Starting new file', file);
+        debug('Starting new file', fileInfo);
       }
 
-      // Start and end of the current chunk
+      // Read and handle the chunk
       const start = position * chunkSize;
-      const end = start + Math.min(chunkSize, (file.size - start));
-      let slice: Blob;
+      const end = start + Math.min(chunkSize, (fileInfo.size - start));
+      this.uploadProvider.getFileSlice(currentFile, start, end).then((value : string | ArrayBuffer) => {
+        let data : String | ArrayBuffer = '';
 
-      if (file.webkitSlice) {
-        slice = file.webkitSlice(start, end);
-      } else {
-        slice = file.slice(start, end);
-      }
-      // eslint-disable-next-line no-use-before-define
-      reader.readAsArrayBuffer(slice);
-    };
-
-    const reader = new FileReader();
-    reader.onload = (readerEvent) => {
-      let data : String | ArrayBuffer = '';
-
-      if (!readerEvent.target || !readerEvent.target.result) {
-        throw new Error('Internal error: Reader target or result is undefined');
-      }
-
-      if (this.method === 'socket') {
-        // Convert ArrayBuffer to string as we cannot send ArrayBuffers over socket.io
-        const uintArray = new Uint8Array(readerEvent.target.result as ArrayBuffer);
-        uintArray.forEach((byte) => {
-          data += String.fromCharCode(byte);
-        });
-      } else if (this.method === 'webrtc') {
-        // WebRTC can send ArrayBuffers so we don't need to convert
-        data = readerEvent.target.result;
-      }
-
-      // Send file chunk to partner
-      emit(data, true, () => {
-        transmitted += chunkSize;
-
-        // Check if file transmitted completely
-        if (transmitted >= size) {
-          debug('Completed transfer of file', currentFileIndex);
-          transmitted = 0;
-          currentFileIndex += 1;
-
-          // Inform partner that file is complete
-          emit({
-            type: 'file complete',
+        if (this.method === 'socket') {
+          // Convert ArrayBuffer to string as we cannot send ArrayBuffers over socket.io
+          const uintArray = new Uint8Array(value as ArrayBuffer);
+          uintArray.forEach((byte) => {
+            data += String.fromCharCode(byte);
           });
-
-          // Check if all files have been transmitted
-          if (currentFileIndex >= this.totalFiles) {
-            // Finish transfer
-            debug('Finished transferring all files');
-            this.finishedTransfer = true;
-
-            this.openPage('/completed');
-
-            clearInterval(estimateInterval);
-
-            return;
-          }
-          debug('Transferring next file', currentFileIndex, this.totalFiles);
+        } else if (this.method === 'webrtc') {
+          // WebRTC can send ArrayBuffers so we don't need to convert
+          data = value;
         }
 
-        // Calculate progress
-        this.progress = (transmitted / size) * 100;
-        emit({
-          type: 'upload progress',
-          progress: this.progress,
+        // Send file chunk to partner
+        emit(data, true, () => {
+          transmitted += chunkSize;
+
+          // Check if file transmitted completely
+          if (transmitted >= size) {
+            debug('Completed transfer of file', currentFileIndex);
+            transmitted = 0;
+            currentFileIndex += 1;
+
+            // Inform partner that file is complete
+            emit({
+              type: 'file complete',
+            });
+
+            // Check if all files have been transmitted
+            if (currentFileIndex >= this.totalFiles) {
+              // Finish transfer
+              debug('Finished transferring all files');
+              this.finishedTransfer = true;
+
+              this.openPage('/completed');
+
+              clearInterval(estimateInterval);
+
+              return;
+            }
+            debug('Transferring next file', currentFileIndex, this.totalFiles);
+          }
+
+          // Calculate progress
+          this.progress = (transmitted / size) * 100;
+          emit({
+            type: 'upload progress',
+            progress: this.progress,
+          });
+
+          this.triggerUpdate();
+
+          // Get next package
+          const position = transmitted / chunkSize;
+          sendFileData(position, currentFileIndex);
         });
-
-        this.triggerUpdate();
-
-        // Get next package
-        const position = transmitted / chunkSize;
-        sendFileData(position, currentFileIndex);
       });
     };
 
@@ -615,6 +608,7 @@ export default class Transfer {
     let filesLeft = 1;
     let filesAvailible = 1;
     let currentFile : TransferFile;
+    let processor : DownloadProcessor;
 
     analytics("start-download");
 
@@ -653,7 +647,11 @@ export default class Transfer {
       debug('Download of file completed', parts.length, filename);
 
       // Create file from ArrayBuffers
-      const blob = new Blob(parts, { type });
+      let blob = new Blob(parts, { type });
+
+      if (processor) {
+        blob = processor.process(blob);
+      }
 
       debug('Created blob from file, saving', blob.size, filename, type);
       saveAs(blob, filename);
@@ -717,6 +715,14 @@ export default class Transfer {
         this.estimate = message.estimate as number;
       } else if (message.type === 'use transfer method') {
         this.method = message.method as string;
+      } else if (message.type === 'use processor') {
+        switch(message.processor) {
+          case 'DefaultProcessor':
+            processor = new DefaultProcessor();
+            break;
+          default:
+            throw new Error('Internal error: Partner requested unknown download processor: ' + message.processor);
+        }
       }
 
       this.triggerUpdate();

@@ -7,6 +7,7 @@ import Section from '../components/Section';
 import Spacer from '../components/Spacer';
 import Transfer from '../classes/Transfer';
 import { PropsWithTransfer } from '../types';
+import FileInputUploadProvider from '../classes/uploadProviders/FileInputUploadProvider';
 
 const SelectFile = ({ transfer } : PropsWithTransfer) => (
   <div>
@@ -28,7 +29,9 @@ const SelectFile = ({ transfer } : PropsWithTransfer) => (
               }
 
               // eslint-disable-next-line no-param-reassign
-              transfer.selectedFiles = event.target.files;
+              const provider = new FileInputUploadProvider(event.target.files);
+
+              transfer.uploadProvider = provider;
               transfer.triggerUpdate();
             }}
           />
@@ -44,7 +47,7 @@ const SelectFile = ({ transfer } : PropsWithTransfer) => (
         <button
           type="button"
           onClick={() => transfer.uploadFiles()}
-          disabled={!transfer.selectedFiles || transfer.selectedFiles.length === 0}
+          disabled={!transfer.uploadProvider || transfer.uploadProvider.getNumberOfFiles() === 0}
         >
           Start transfer
         </button>
