@@ -24,6 +24,10 @@ const faqContent = {
       content: "blymp.io's complete source code is open source and can be seen at <a href='https://github.com/vantezzen/blymp-io'>https://github.com/vantezzen/blymp-io</a>"
     },
     {
+      title: "Can I test new features before their release?",
+      content: "Yes! You can visit <a href='https://next.blymp.io'>next.blymp.io</a> where we test new features before they will be released on the main site."
+    },
+    {
       title: "Can I contribute to blymp.io?",
       content: "Yes, contributors are always welcome! If you have some experience with JavaScript and ReactJS, you can dive right into the code at <a href='https://github.com/vantezzen/blymp-io'>https://github.com/vantezzen/blymp-io</a>"
     },

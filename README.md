@@ -15,7 +15,7 @@ blymp.io is a webapp that allows you to easily transfer files between devices wi
 
 It uses modern technologies like WebRTC, Blobs and WebSockets to allow files to be transferred as fast as possible.
 
-You can use blymp.io by going to <https://blymp.io>
+You can use blymp.io by going to <https://blymp.io>. Feeling adventurous? Try blymp.io's newest features on <https://next.blymp.io>
 
 - [Quick Start](#quick-start)
 - [Folder Structure](#folder-structure)

@@ -162,6 +162,26 @@ const Home = ({ transfer } : PropsWithTransfer) => (
 
     <Separator />
 
+    {window.location.hostname.includes('next.blymp.io') && (
+      <>
+        <Section>
+          <div style={{ margin: 30 }}>
+            <h2>Welcome to next.blymp.io!</h2>
+            <p>
+              Thank you for testing the newest features of blymp.io.<br />
+              If you find any bugs or have other feedback, please post it on <a href="https://github.com/vantezzen/blymp-io/issues">https://github.com/vantezzen/blymp-io/issues</a>.
+            </p>
+            <p>
+              Please keep in mind that this site runs independent from the normal blymp.io,<br />
+              meaning that the 4-digit codes from the normal blymp.io won't work here and vice versa. 
+            </p>
+          </div>
+        </Section>
+
+        <Spacer size="3rem" />
+      </>
+    )}
+
     <h2 id="how-it-works">How it works</h2>
     <div className="feature">
       <img src={ConnectImg} alt="Connect" />

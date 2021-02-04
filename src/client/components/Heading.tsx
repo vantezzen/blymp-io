@@ -19,7 +19,11 @@ const Heading = ({ fullSize } : HeadingProps) => (
     </Link>
     {fullSize && (
       <>
-        <h1>blymp.io</h1>
+        <h1>
+          {window.location.hostname.includes('next.blymp.io') ? (
+            <span style={{ fontFamily: 'monospace', fontWeight: 'lighter' }}>next.blymp.io</span>
+          ) : 'blymp.io'}
+        </h1>
         <p style={{ color: '#B4B4B4', marginTop: 0 }}>Transfer files between any device</p>
       </>
     )}
