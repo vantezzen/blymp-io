@@ -8,6 +8,7 @@ import analytics from '../analytics';
 import UploadProvider from './uploadProviders/UploadProvider';
 import UploadService from './UploadService';
 import DownloadService from './DownloadService';
+import CompressionUploadProvider from './uploadProviders/CompressionUploadProvider';
 
 const debug = debugging('blymp:transfer');
 
@@ -359,6 +360,14 @@ export default class Transfer {
 
     // Open the transfer page that shows the current status of the transfer
     this.openPage('/transfer');
+
+    // Add compression if the file size is over 10kb but under 1GB
+    if (
+      this.uploadProvider.getEstimatedTotalSize() > (1024 * 10) && 
+      this.uploadProvider.getEstimatedTotalSize() > (1024 * 1024 * 1024)
+    ) {
+      this.uploadProvider = new CompressionUploadProvider(this.uploadProvider);
+    }
 
     // The UploadService is doing all the work of actually transmitting the data
     const service = new UploadService(this, this.uploadProvider);

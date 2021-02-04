@@ -6,5 +6,5 @@ export default interface DownloadProcessor {
    * Process a downloaded file before the user gets to open it
    * @param blob Blob to process
    */
-  process(blob:Blob) : Blob;
+  process(blob:Blob) : Promise<Blob>;
 }

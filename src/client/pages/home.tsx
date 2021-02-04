@@ -142,6 +142,9 @@ const Home = ({ transfer } : PropsWithTransfer) => (
         <h2>Why blymp.io</h2>
 
         <Checktext>
+          Very fast
+        </Checktext>
+        <Checktext>
           No registration
         </Checktext>
         <Checktext>

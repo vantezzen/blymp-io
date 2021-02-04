@@ -36,4 +36,9 @@ export default interface UploadProvider {
    * @param index Index of the file
    */
   prepareFile(index : number) : Promise<void>;
+
+  /**
+   * Get an estimated file size for all files
+   */
+  getEstimatedTotalSize() : number;
 }

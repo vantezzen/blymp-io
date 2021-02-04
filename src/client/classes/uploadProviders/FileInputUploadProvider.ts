@@ -39,6 +39,16 @@ export default class FileInputUploadProvider implements UploadProvider {
       this.currentResolver = undefined;
     };
   }
+  
+  getEstimatedTotalSize(): number {
+    let size = 0;
+
+    for (let i = 0; i < this.selectedFiles.length; i++) {
+      size += this.selectedFiles[i].size;
+    }
+
+    return size;
+  }
 
   prepareFile(_: number): Promise<void> {
     // This provider doesn't need to do any preperations

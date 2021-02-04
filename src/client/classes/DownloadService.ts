@@ -1,6 +1,7 @@
 import debugging from 'debug';
 import { saveAs } from 'file-saver';
 import { BufferLike, TransferControlMessage, TransferFile } from '../types';
+import DecompressProcessor from './downloadProcessors/DecompressProcessor';
 import DefaultProcessor from './downloadProcessors/DefaultProcessor';
 import DownloadProcessor from './downloadProcessors/DownloadProcessor';
 import Transfer from './Transfer';
@@ -99,7 +100,7 @@ export default class DownloadService {
   /**
    * Complete and download the current file
    */
-  private completeFile() {
+  private async completeFile() {
     if (!this.currentFile) {
       throw new Error('State error: Cannot complete file if no file is selected');
     }
@@ -113,7 +114,7 @@ export default class DownloadService {
 
     // Preprocess the file if we have a processor to do so
     if (this.processor) {
-      blob = this.processor.process(blob);
+      blob = await this.processor.process(blob);
     }
 
     // Save the file to disk
@@ -141,7 +142,7 @@ export default class DownloadService {
    * 
    * @param data Data received
    */
-  private handleData(data: string | BufferLike | TransferControlMessage) {
+  private async handleData(data: string | BufferLike | TransferControlMessage) {
     // eslint-disable-next-line no-underscore-dangle
     if ((data as BufferLike)._isBuffer) {
       this.addFileChunk((data as BufferLike).buffer, true);
@@ -178,7 +179,7 @@ export default class DownloadService {
     } else if (message.type === 'new file part') {
       this.addFileChunk(message.part as string);
     } else if (message.type === 'file complete') {
-      this.completeFile();
+      await this.completeFile();
     } else if (message.type === 'upload progress') {
       this.transfer.progress = message.progress as number;
     } else if (message.type === 'time estimate') {
@@ -189,6 +190,9 @@ export default class DownloadService {
       switch(message.processor) {
         case 'DefaultProcessor':
           this.processor = new DefaultProcessor();
+          break;
+        case 'DecompressProcessor':
+          this.processor = new DecompressProcessor();
           break;
         default:
           throw new Error('Internal error: Partner requested unknown download processor: ' + message.processor);
