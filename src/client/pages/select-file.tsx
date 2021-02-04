@@ -6,8 +6,9 @@ import Heading from '../components/Heading';
 import Section from '../components/Section';
 import Spacer from '../components/Spacer';
 import Transfer from '../classes/Transfer';
+import { PropsWithTransfer } from '../types';
 
-const SelectFile = ({ transfer }) => (
+const SelectFile = ({ transfer } : PropsWithTransfer) => (
   <div>
     <Heading />
 
@@ -22,6 +23,10 @@ const SelectFile = ({ transfer }) => (
             id="files"
             multiple
             onChange={(event) => {
+              if (!event.target.files) {
+                throw new Error('View error: No files');
+              }
+
               // eslint-disable-next-line no-param-reassign
               transfer.selectedFiles = event.target.files;
               transfer.triggerUpdate();
@@ -39,7 +44,7 @@ const SelectFile = ({ transfer }) => (
         <button
           type="button"
           onClick={() => transfer.uploadFiles()}
-          disabled={transfer.selectedFiles.length === 0}
+          disabled={!transfer.selectedFiles || transfer.selectedFiles.length === 0}
         >
           Start transfer
         </button>

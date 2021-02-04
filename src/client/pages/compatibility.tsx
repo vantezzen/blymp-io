@@ -9,7 +9,11 @@ import SimplePeer from 'simple-peer';
 import Heading from '../components/Heading';
 import Section from '../components/Section';
 
-const Status = ({ isCompatible }) => (
+type StatusProps = {
+  isCompatible: boolean
+}
+
+const Status = ({ isCompatible } : StatusProps) => (
   <>
     {isCompatible
       ? <Check color="#64fa82" />
@@ -21,11 +25,11 @@ Status.propTypes = {
 };
 
 const Compatibility = () => {
-  const compatibilities = {};
-
-  compatibilities.webrtc = SimplePeer.WEBRTC_SUPPORT;
-  compatibilities.sockets = 'WebSocket' in window || 'MozWebSocket' in window;
-  compatibilities.blob = !!window.Blob;
+  const compatibilities = {
+    webrtc: SimplePeer.WEBRTC_SUPPORT,
+    sockets: 'WebSocket' in window || 'MozWebSocket' in window,
+    blob: 'Blob' in window
+  };
 
   /**
    * Possible status:

@@ -5,7 +5,11 @@ import Close from 'react-ionicons/lib/IosClose';
 import Heading from '../components/Heading';
 import Section from '../components/Section';
 
-const Disconnected = ({ newTransfer }) => (
+type DisconnectedProps = {
+  newTransfer: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+}
+
+const Disconnected = ({ newTransfer } : DisconnectedProps) => (
   <div>
     <Heading />
 

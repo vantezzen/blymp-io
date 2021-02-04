@@ -16,13 +16,14 @@ import TransferImg from '../assets/tutorial-transfer.svg';
 import faqContent from '../assets/faq-content';
 
 import './home.css';
+import { PropsWithTransfer } from '../types';
 
-const Heading = React.lazy(() => import('../components/Heading'));
-const InfoCircle = React.lazy(() => import('react-ionicons/lib/IosWarningOutline'));
-const CodeInput = React.lazy(() => import('react-code-input'));
-const Faq = React.lazy(() => import('react-faq-component'));
+const Heading = React.lazy(() => import(/* webpackChunkName: "components-heading" */ '../components/Heading'));
+const InfoCircle = React.lazy(() => import(/* webpackChunkName: "ionicons-info-circle" */ 'react-ionicons/lib/IosWarningOutline'));
+const CodeInput = React.lazy(() => import(/* webpackChunkName: "react-code-input" */ 'react-code-input'));
+const Faq = React.lazy(() => import(/* webpackChunkName: "react-faq-component" */ 'react-faq-component'));
 
-const Home = ({ transfer }) => (
+const Home = ({ transfer } : PropsWithTransfer) => (
   <div>
     <Suspense fallback={<div />}>
       <Heading fullSize />
@@ -56,6 +57,8 @@ const Home = ({ transfer }) => (
           <Suspense fallback={<div />}>
             <CodeInput
               type="number"
+              name="receiverId"
+              inputMode="numeric"
               fields={4}
               className="code-input"
               value={transfer.receiverId ? String(transfer.receiverId) : ''}
@@ -98,10 +101,12 @@ const Home = ({ transfer }) => (
         <Suspense fallback={<div />}>
           <CodeInput
             type="number"
+            name="senderId"
+            inputMode="numeric"
             fields={4}
             className="code-input"
             autoFocus
-            onChange={id => transfer.useReceiver(id)}
+            onChange={id => transfer.useReceiver(Number(id))}
             inputStyleInvalid={{
               animation: 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both',
             }}

@@ -1,11 +1,12 @@
 /**
  * Transfer: Stores and manages all information about the current transfer
  */
-import SimplePeer from 'simple-peer';
+import SimplePeer, { SimplePeerData } from 'simple-peer';
 import socket from 'socket.io-client';
 import { saveAs } from 'file-saver';
 import debugging from 'debug';
 import analytics from '../analytics';
+import { BufferLike, TransferControlMessage, TransferFile } from '../types';
 
 const debug = debugging('blymp:transfer');
 
@@ -20,70 +21,70 @@ export default class Transfer {
   /**
    * Current socket.io connection
    */
-  socket = null;
+  socket : SocketIOClient.Socket;
 
   /**
    * Is this page the sending end of the transfer?
    * @type Boolean
    */
-  isSender = false;
+  isSender: boolean = false;
 
   /**
    * ID of the socket.io socket. This will be saved so we can resume
    * a socket after the connection has been lost
    * @type String
    */
-  socketId = null;
+  socketId: string | null = null;
 
   /**
    * Our own receiver id
    * @type Number, 4 digit
    */
-  receiverId = null;
+  receiverId: number | null = null;
 
   /**
    * Is the current input receiver ID valid?
    * Used to display the invalid animation
    * @type Boolean
    */
-  isValidId = true;
+  isValidId: boolean = true;
 
   /**
    * Handler that gets called once an important change happens.
    * This allows us to update the React UI when there are changes in the transfer
    * @type Function
    */
-  updateHandler = () => {};
+  updateHandler: Function = () => {};
 
   /**
    * WebRTC peer that we are connected to
    */
-  peer = null;
+  peer : SimplePeer.Instance | null = null;
 
   /**
    * Signal that we got from our peer
    * @type Object
    */
-  peerSignal = null;
+  peerSignal: object | null = null;
 
   /**
    * Open a page using react router.
    * This will get set by a React component that has access to Hooks
    * @type Function
    */
-  openPage = () => {}
+  openPage: Function = (_ : String) => {}
 
   /**
    * Number of files that are being transferred
    * @type Integer
    */
-  totalFiles = 0;
+  totalFiles: number = 0;
 
   /**
    * Current file we are transferring
    * @type Integer
    */
-  currentFile = 0;
+  currentFile: number = 0;
 
   /**
    * Name of the file we are currently transferring
@@ -94,25 +95,25 @@ export default class Transfer {
    * Is this transfer completed?
    * @type Boolean
    */
-  finishedTransfer = false;
+  finishedTransfer: boolean = false;
 
   /**
    * Estimated time needed for the transfer to be completed in seconds
    * @type Integer
    */
-  estimate = 10;
+  estimate: number = 10;
 
   /**
    * Number between 0-100, indicating the progress of the transfer of the current file
    * @type Integer
    */
-  progress = 0;
+  progress: number = 0;
 
   /**
    * Files that the user selected and wants to transfer
    * @type Array
    */
-  selectedFiles = [];
+  selectedFiles: FileList | undefined;
 
   /**
    * Initialize the socket to listen for status changes
@@ -122,12 +123,12 @@ export default class Transfer {
       debug('Connected socket');
 
       if (!this.socketId) {
-        this.socketId = this.socket.io.engine.id;
+        this.socketId = this.socket.id;
       }
     });
 
     // Someone entered our receiver ID
-    this.socket.on('pair partner found', (method) => {
+    this.socket.on('pair partner found', (method : string) => {
       debug('Found a pair partner', method);
       analytics("found-partner");
 
@@ -142,14 +143,18 @@ export default class Transfer {
     });
 
     // Our partner sent its WebRTC peer information
-    this.socket.on('got partner peer', (partner) => {
+    this.socket.on('got partner peer', (partner : SimplePeer.SignalData) => {
       debug('Got a partner peer', partner);
+
+      if (!this.peer) {
+        throw new Error('Internal error: Peer is undefined');
+      }
 
       this.peer.signal(partner);
     });
 
     // Our partner requested to change the transfer method
-    this.socket.on('set transfer method', (method) => {
+    this.socket.on('set transfer method', (method : string) => {
       debug('Setting transfer method to', method);
 
       this.method = method;
@@ -185,7 +190,7 @@ export default class Transfer {
     this.initSocket();
 
     // Ask socket server to give us a new receiver ID
-    this.socket.emit('new receiver id', this.method, (id) => {
+    this.socket.emit('new receiver id', this.method, (id: number) => {
       debug('Received own ID', id);
       analytics("generated-id");
 
@@ -199,7 +204,7 @@ export default class Transfer {
    * Try to use the receiver ID input into the page
    * @param {number} id Receiver ID
    */
-  useReceiver(id) {
+  useReceiver(id: number) {
     // Reset ID to valid so we can replay the invalid animation if needed
     this.isValidId = true;
     this.triggerUpdate();
@@ -215,7 +220,7 @@ export default class Transfer {
     }
 
     // Ask the server to connect us the the other peer
-    this.socket.emit('use receiver id', id, this.method, (response, method) => {
+    this.socket.emit('use receiver id', id, this.method, (response : boolean, method : string) => {
       if (response === true) {
         // Server informed us that the other peer is valid and listening
         debug('Is valid ID, using', id, method);
@@ -262,7 +267,10 @@ export default class Transfer {
 
         // Automatically open file selection popup
         setTimeout(() => {
-          document.querySelector('input[type=file]').click();
+          const input : HTMLInputElement | null = document.querySelector('input[type=file]');
+          if(input) {
+            input.click();
+          }
         }, 500);
       }
     };
@@ -282,17 +290,17 @@ export default class Transfer {
         objectMode: true,
       });
 
-      let abortConnection;
+      let abortConnection: NodeJS.Timeout | number;
 
       // Listen to events on our peer
-      this.peer.on('signal', (data) => {
+      this.peer.on('signal', (data: object) => {
         debug('Got signal from peer: ', data);
 
         this.peerSignal = data;
 
         // Abort connection if not connected after 3 seconds
         abortConnection = setTimeout(() => {
-          if (window.type === 'down') {
+          if (!this.isSender) {
             debug('Peer connection timed out, using sockets instead');
             fallbackToSockets();
           }
@@ -305,12 +313,12 @@ export default class Transfer {
       this.peer.on('connect', () => {
         debug('Connected to peer');
 
-        clearTimeout(abortConnection);
+        clearTimeout(abortConnection as NodeJS.Timeout);
         openFileSelect();
       });
       // There was an error while connecting to the other peer
       // Probably a problem with the network so fall back to using sockets instead
-      this.peer.on('error', (err) => {
+      this.peer.on('error', (err: any) => {
         debug('Got error while connecting WebRTC', err);
 
         fallbackToSockets();
@@ -336,17 +344,25 @@ export default class Transfer {
    * Upload the currently selected files to our partner
    */
   uploadFiles() {
+    if (!this.selectedFiles) {
+      throw new Error('Internal error: Cannot upload files as no files were selected');
+    }
+
     // List of last estimates, so we can calculate a more stable estimate
-    let lastEstimates = [];
+    let lastEstimates : number[] = [];
 
     analytics("start-upload");
 
     // Helper method to easily emit new data
-    const emit = (data, isFilePart = false, callback = false) => {
+    const emit = (data: String | ArrayBuffer | Object, isFilePart = false, callback : false | Function = false) => {
       if (this.method === 'webrtc') {
+        if (!this.peer) {
+          throw new Error('Internal error: Cannot send data as no peer is connected');
+        }
+
         if (isFilePart) {
           try {
-            this.peer.send(data);
+            this.peer.send(data as SimplePeerData);
           } catch (e) {
             debug('Peer connection has been reset - falling back to sockets');
 
@@ -417,7 +433,7 @@ export default class Transfer {
     this.totalFiles = this.selectedFiles.length;
 
     // Status about the current file
-    let size;
+    let size: number;
     let transmitted = 0;
     this.progress = 0;
 
@@ -441,7 +457,7 @@ export default class Transfer {
         // Helper function that scales numbers to another range
         // Like arduino "map" function
         // eslint-disable-next-line max-len
-        const scale = (num, inMin, inMax, outMin, outMax) => (num - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+        const scale = (num: number, inMin: number, inMax: number, outMin: number, outMax: number) => (num - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 
         // Number of estimates we should keep
         const keepEstimates = scale(timeSince, 50, 1000, 50, 5);
@@ -481,7 +497,11 @@ export default class Transfer {
     }, 50);
 
     // Send part of a file
-    const sendFileData = (position, currentFile) => {
+    const sendFileData = (position: number, currentFile: number) => {
+      if (!this.selectedFiles) {
+        throw new Error('Internal error: Cannot upload files as no files were selected');
+      }
+      
       // `currentFile` is 0 based but this.currentFile is 1 based so we need to add 1
       this.currentFile = currentFile + 1;
       this.triggerUpdate();
@@ -508,7 +528,7 @@ export default class Transfer {
       // Start and end of the current chunk
       const start = position * chunkSize;
       const end = start + Math.min(chunkSize, (file.size - start));
-      let slice;
+      let slice: Blob;
 
       if (file.webkitSlice) {
         slice = file.webkitSlice(start, end);
@@ -521,10 +541,15 @@ export default class Transfer {
 
     const reader = new FileReader();
     reader.onload = (readerEvent) => {
-      let data = '';
+      let data : String | ArrayBuffer = '';
+
+      if (!readerEvent.target || !readerEvent.target.result) {
+        throw new Error('Internal error: Reader target or result is undefined');
+      }
+
       if (this.method === 'socket') {
         // Convert ArrayBuffer to string as we cannot send ArrayBuffers over socket.io
-        const uintArray = new Uint8Array(readerEvent.target.result);
+        const uintArray = new Uint8Array(readerEvent.target.result as ArrayBuffer);
         uintArray.forEach((byte) => {
           data += String.fromCharCode(byte);
         });
@@ -586,15 +611,15 @@ export default class Transfer {
    * Handle downloading and saving the files
    */
   downloadFiles() {
-    let parts = [];
+    let parts : Array<string | ArrayBuffer> = [];
     let filesLeft = 1;
     let filesAvailible = 1;
-    let currentFile;
+    let currentFile : TransferFile;
 
     analytics("start-download");
 
     // Set number of files being transferred
-    const setFiles = (files) => {
+    const setFiles = (files: number) => {
       debug('Setting number of total files to', files);
 
       filesLeft = files;
@@ -604,26 +629,27 @@ export default class Transfer {
       this.currentFile = 1;
     };
     // Add a new part to the current file
-    const addFileChunk = (part, isBuffer = false) => {
+    const addFileChunk = (part: string | ArrayBuffer, isBuffer = false) => {
       debug('Adding new chunk to the current file');
 
-      let buffer;
+      let buffer: ArrayBuffer;
       if (isBuffer) {
         // Use raw buffer
-        buffer = part;
+        buffer = part as ArrayBuffer;
       } else {
+        const p = part as string;
         // Convert string to ArrayBuffer
-        buffer = new ArrayBuffer(part.length);
+        buffer = new ArrayBuffer(p.length);
         const bufView = new Uint8Array(buffer);
-        for (let i = 0, strLen = part.length; i < strLen; i += 1) {
-          bufView[i] = part.charCodeAt(i);
+        for (let i = 0, strLen = p.length; i < strLen; i += 1) {
+          bufView[i] = p.charCodeAt(i);
         }
       }
 
       parts.push(buffer);
     };
     // Complete and download current file
-    const completeFile = (filename, type) => {
+    const completeFile = (filename: string, type: string) => {
       debug('Download of file completed', parts.length, filename);
 
       // Create file from ArrayBuffers
@@ -647,10 +673,10 @@ export default class Transfer {
       }
     };
 
-    const handleData = (data) => {
+    const handleData = (data: string | BufferLike | TransferControlMessage) => {
       // eslint-disable-next-line no-underscore-dangle
-      if (data._isBuffer) {
-        addFileChunk(data.buffer, true);
+      if ((data as BufferLike)._isBuffer) {
+        addFileChunk((data as BufferLike).buffer, true);
         return;
       } if (typeof data === 'string') {
         // Test if is file chunk
@@ -667,30 +693,40 @@ export default class Transfer {
         data = JSON.parse(data);
       }
 
-      if (data.type === 'number of files') {
-        setFiles(data.num);
-      } else if (data.type === 'new file') {
-        currentFile = data;
+      const message = data as TransferControlMessage;
+      if (message.type === 'number of files') {
+        setFiles(message.num as number);
+      } else if (message.type === 'new file') {
+        if (!message.name || !message.fileType) {
+          throw new Error('Internal Error: Received file is not valid');
+        }
 
-        this.currentFileName = data.name;
+        // We already validated that message is a valid Transferfile above but Typescript
+        // doesn't correctly identify this so we need to convert to unknown first
+        currentFile = message as unknown as TransferFile;
+
+        this.currentFileName = message.name as string;
         this.triggerUpdate();
-      } else if (data.type === 'new file part') {
-        addFileChunk(data.part);
-      } else if (data.type === 'file complete') {
+      } else if (message.type === 'new file part') {
+        addFileChunk(message.part as string);
+      } else if (message.type === 'file complete') {
         completeFile(currentFile.name, currentFile.fileType);
-      } else if (data.type === 'upload progress') {
-        this.progress = data.progress;
-      } else if (data.type === 'time estimate') {
-        this.estimate = data.estimate;
-      } else if (data.type === 'use transfer method') {
-        this.method = data.method;
+      } else if (message.type === 'upload progress') {
+        this.progress = message.progress as number;
+      } else if (message.type === 'time estimate') {
+        this.estimate = message.estimate as number;
+      } else if (message.type === 'use transfer method') {
+        this.method = message.method as string;
       }
 
       this.triggerUpdate();
     };
 
     if (this.method === 'webrtc') {
-      this.peer.on('data', (response) => {
+      if (!this.peer) {
+        throw new Error('Internal Error: Peer is undefined');
+      }
+      this.peer.on('data', (response: string | BufferLike | TransferControlMessage) => {
         handleData(response);
       });
     }

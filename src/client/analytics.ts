@@ -1,7 +1,7 @@
 /**
  * Analytics Helper
  */
-const createEvent = (name) => {
+const createEvent = (name : string) => {
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({
     event: 'analytics',

@@ -5,7 +5,11 @@ import { Link } from 'react-router-dom';
 
 import Spacer from './Spacer';
 
-const Heading = ({ fullSize }) => (
+type HeadingProps = {
+  fullSize: boolean
+}
+
+const Heading = ({ fullSize } : HeadingProps) => (
   <div className="heading">
     <Link to="/">
       <Planet

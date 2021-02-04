@@ -5,11 +5,12 @@ import { Line } from 'rc-progress';
 import Heading from '../components/Heading';
 import Section from '../components/Section';
 import TransferClass from '../classes/Transfer';
+import { PropsWithTransfer } from '../types';
 
-const roundToOneDecimal = num => Math.round(num * 10) / 10;
+const roundToOneDecimal = (num : number) => Math.round(num * 10) / 10;
 
 // Format seconds into a better-readable format like hours or minutes
-const formatSeconds = (seconds) => {
+const formatSeconds = (seconds : number) => {
   if (seconds > 3600) {
     return `${roundToOneDecimal(seconds / 3600)}h`;
   }
@@ -19,7 +20,7 @@ const formatSeconds = (seconds) => {
   return `${seconds}s`;
 };
 
-const Transfer = ({ transfer }) => (
+const Transfer = ({ transfer } : PropsWithTransfer) => (
   <div>
     <Heading />
 

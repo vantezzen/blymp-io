@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { ChildrenProps } from '../types';
 
-const Section = ({ children }) => (
+const Section = ({ children } : ChildrenProps) => (
   <div className="section-container">
     <div className="section">
       <div>
