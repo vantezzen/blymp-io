@@ -37,6 +37,7 @@
     "react-ionicons": "^3.0.0",
     "react-router-dom": "^5.1.2",
     "react-transition-group": "^4.3.0",
+    "regenerator-runtime": "^0.13.7",
     "rxjs": "^6.5.4",
     "simple-peer": "^9.6.2",
     "socket.io": "^2.3.0",
