@@ -10,7 +10,7 @@ const outputDirectory = 'dist';
 module.exports = {
   entry: {
     main: ['babel-polyfill', './src/client/index.tsx'],
-    // worker: ['babel-polyfill', "./src/client/worker.js"]
+    worker: ['babel-polyfill', "./src/client/worker.js"]
   },
   devtool: "source-map",
   output: {
