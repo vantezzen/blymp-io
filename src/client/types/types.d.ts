@@ -1,5 +1,5 @@
 declare interface Window {
-  dataLayer?: Array<any>
+  sa_event: (name : String) => void
 }
 declare interface File {
   webkitSlice: (start?: number | undefined, end?: number | undefined) => Blob

@@ -16,6 +16,8 @@
     <link rel="apple-touch-icon" href="public/icons/apple-icon-180.png">
 
     <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <script>window.sa_event=window.sa_event||function(){a=[].slice.call(arguments);sa_event.q?sa_event.q.push(a):sa_event.q=[a]};</script>
 
     <link rel="apple-touch-startup-image" href="public/icons/apple-splash-2048-2732.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
     <link rel="apple-touch-startup-image" href="public/icons/apple-splash-2732-2048.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
@@ -93,60 +95,9 @@
             </div>
         </div>
     </noscript>
-
-    <!-- CMP -->
-    <script>
-        window.klaroConfig = {
-            htmlTexts: true,
-            hideLearnMore: true,
-            translations: {
-                en: {
-                    privacyPolicyUrl: '/#privacy',
-                    consentNotice: {
-                        description: `
-                            <h2>We value your privacy!</h2>
-                            <p>
-                                We want to make sure that you get the best experience while using blymp.io.
-                                This is why we would like to use Google Analytics to see how users use blymp.io and
-                                what we can do to make it even better.<br />
-                                This will only include anonymized data and does not include any files or data you send.
-                            </p>
-                            <p>
-                                If you don't want to help us improve blymp.io that's ok too 😔
-                            </p>
-                        `,
-                    },
-                    ok: "Yes, that's ok",
-                    decline: "No, please don't",
-                }
-            },
-            noticeAsModal: true,
-            apps : [
-                {
-                    name : 'google-analytics',
-                    default: true,
-                    title : 'Google Analytics',
-                    purposes : ['statistics'],
-                    cookies : [/^ga/i]
-                },
-            ],
-        }
-    </script>
-    <script 
-        type="text/plain"
-        data-type="application/javascript"
-        data-name="google-analytics"
-    >
-    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-5QVWSP3');</script>
-    <script defer 
-        data-config="klaroConfig"
-        type="application/javascript"
-        src="https://cdn.kiprotect.com/klaro/latest/klaro-no-translations.js">
-    </script>
+    
+    <script async defer src="https://sa.blymp.io/latest.js" data-skip-dnt="true"></script>
+    <noscript><img src="https://sa.blymp.io/noscript.gif" alt=""/></noscript>
 </body>
 
 </html>
