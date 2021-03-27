@@ -65,7 +65,7 @@ export default class UploadService {
     this.uploadProvider = provider;
 
     // Chunk size is 15kb for WebRTC, 512kb for sockets
-    this.chunkSize = transfer.method === 'webrtc' ? 1024 * 15 : 1024 * 512;
+    this.chunkSize = transfer.connection.method === 'webrtc' ? 1024 * 15 : 1024 * 512;
   }
 
   /**
@@ -76,16 +76,16 @@ export default class UploadService {
    * @param callback Callback to execute once the message is acknowledged from the partner
    */
   private emit(data: String | ArrayBuffer | Object, isFilePart = false, callback : false | Function = false) {
-    if (this.transfer.method === 'webrtc') {
-      if (!this.transfer.peer) {
+    if (this.transfer.connection.method === 'webrtc') {
+      if (!this.transfer.connection.peer) {
         throw new Error('Internal error: Cannot send data as no peer is connected');
       }
 
       if (isFilePart) {
         try {
-          this.transfer.peer.send(data as SimplePeerData);
+          this.transfer.connection.peer.send(data as SimplePeerData);
           if (callback) {
-            this.transfer.socket.once("acknowledge rtc data", callback);
+            this.transfer.connection.socket.once("acknowledge rtc data", callback);
           }
         } catch (e) {
           debug('Peer connection has been reset - falling back to sockets');
@@ -93,8 +93,8 @@ export default class UploadService {
           // Switching methods will change the transfer speed
           // Delete current estimates to get a more accurate one
           this.lastEstimates = [];
-          this.transfer.method = 'socket';
-          this.transfer.socket.emit('proxy to partner', this.transfer.receiverId, {
+          this.transfer.connection.method = 'socket';
+          this.transfer.connection.socket.emit('proxy to partner', this.transfer.receiverId, {
             type: 'use transfer method',
             method: 'socket'
           });
@@ -103,7 +103,7 @@ export default class UploadService {
         }
       } else {
         try {
-          this.transfer.peer.send(JSON.stringify(data));
+          this.transfer.connection.peer.send(JSON.stringify(data));
           if (callback) {
             callback();
           }
@@ -113,8 +113,8 @@ export default class UploadService {
           // Switching methods will change the transfer speed
           // Delete current estimates to get a more accurate one
           this.lastEstimates = [];
-          this.transfer.method = 'socket';
-          this.transfer.socket.emit('proxy to partner', this.transfer.receiverId, {
+          this.transfer.connection.method = 'socket';
+          this.transfer.connection.socket.emit('proxy to partner', this.transfer.receiverId, {
             type: 'use transfer method',
             method: 'socket'
           });
@@ -123,9 +123,9 @@ export default class UploadService {
         }
       }
     } else if (isFilePart) {
-      this.transfer.socket.emit('proxy to partner', this.transfer.receiverId, `###${data}`, callback);
+      this.transfer.connection.socket.emit('proxy to partner', this.transfer.receiverId, `###${data}`, callback);
     } else {
-      this.transfer.socket.emit('proxy to partner', this.transfer.receiverId, data);
+      this.transfer.connection.socket.emit('proxy to partner', this.transfer.receiverId, data);
       if (callback) {
         callback();
       }
@@ -206,13 +206,21 @@ export default class UploadService {
     
     this.transfer.triggerUpdate();
 
+    
     if (position === 0) {
       // We are at the beginning of the file - no data has been sent yet
-      // Let the upload provider prepare the file before we perform any actions on it
+      // Let the upload provider prepare the file before we perform any real actions on it
+      
+      // Already fetch the name for the new file so we can show that info.
+      const fileInfoBeforePrepare = this.uploadProvider.getFileInfo(this.transfer.currentFile, true);
+      this.transfer.currentFileName = fileInfoBeforePrepare.name;
+      this.transfer.triggerUpdate();
+
+      // Let the provider prepare
       await this.uploadProvider.prepareFile(this.transfer.currentFile);
     }
 
-    const fileInfo = this.uploadProvider.getFileInfo(this.transfer.currentFile);
+    const fileInfo = this.uploadProvider.getFileInfo(this.transfer.currentFile, false);
 
     if (position === 0) {
       // We are at the beginning of the file - no data has been sent yet
@@ -246,18 +254,7 @@ export default class UploadService {
   private handleFileSlice(value : string | ArrayBuffer) {
     debug("Got new file slice");
 
-    let data : String | ArrayBuffer = '';
-
-    if (this.transfer.method === 'socket') {
-      // Convert ArrayBuffer to string as we cannot send ArrayBuffers over socket.io
-      const uintArray = new Uint8Array(value as ArrayBuffer);
-      uintArray.forEach((byte) => {
-        data += String.fromCharCode(byte);
-      });
-    } else if (this.transfer.method === 'webrtc') {
-      // WebRTC can send ArrayBuffers so we don't need to convert
-      data = value;
-    }
+    let data = this.transfer.connection.prepareFileSliceForCurrentMethod(value);
 
     // Send file chunk to partner
     debug("Transmitting to partner...");

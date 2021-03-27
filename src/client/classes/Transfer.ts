@@ -1,42 +1,22 @@
-/**
- * Transfer: Stores and manages all information about the current transfer
- */
-import SimplePeer from 'simple-peer';
-import socket from 'socket.io-client';
 import debugging from 'debug';
 import analytics from '../analytics';
 import UploadProvider from './uploadProviders/UploadProvider';
 import UploadService from './UploadService';
 import DownloadService from './DownloadService';
 import CompressionUploadProvider from './uploadProviders/CompressionUploadProvider';
+import Connection from './Connection';
 
 const debug = debugging('blymp:transfer');
 
+/**
+ * Transfer: Stores and manages all information about the current transfer
+ */
 export default class Transfer {
-  /**
-   * Transfer method
-   * One of: 'webrtc', 'socket'
-   * @type String
-   */
-  method = SimplePeer.WEBRTC_SUPPORT ? 'webrtc' : 'socket';
-
-  /**
-   * Current socket.io connection
-   */
-  socket : SocketIOClient.Socket;
-
   /**
    * Is this page the sending end of the transfer?
    * @type Boolean
    */
   isSender: boolean = false;
-
-  /**
-   * ID of the socket.io socket. This will be saved so we can resume
-   * a socket after the connection has been lost
-   * @type String
-   */
-  socketId: string | null = null;
 
   /**
    * Our own receiver id
@@ -57,17 +37,6 @@ export default class Transfer {
    * @type Function
    */
   updateHandler: Function = () => {};
-
-  /**
-   * WebRTC peer that we are connected to
-   */
-  peer : SimplePeer.Instance | null = null;
-
-  /**
-   * Signal that we got from our peer
-   * @type Object
-   */
-  peerSignal: object | null = null;
 
   /**
    * Open a page using react router.
@@ -121,104 +90,13 @@ export default class Transfer {
    */
   transferStatusText : String = "Transferring files...";
 
-  /**
-   * Initialize the socket to listen for status changes
-   */
-  initSocket() {
-    const that = this;
-
-    this.socket.on('connect', () => {
-      debug('Connected socket');
-
-      if (!this.socketId) {
-        this.socketId = this.socket.id;
-      }
-    });
-
-    // Someone entered our receiver ID
-    this.socket.on('pair partner found', (method : string) => {
-      debug('Found a pair partner', method);
-      analytics("found-partner");
-
-      this.openPage('/connecting');
-
-      this.method = method;
-
-      if (method === 'webrtc') {
-        debug('Opening connection for WebRTC connection');
-      }
-      this.connectPeers();
-    });
-
-    // Our partner sent its WebRTC peer information
-    this.socket.on('got partner peer', (partner : SimplePeer.SignalData) => {
-      debug('Got a partner peer', partner);
-
-      if (!this.peer) {
-        throw new Error('Internal error: Peer is undefined');
-      }
-
-      this.peer.signal(partner);
-    });
-
-    // Our partner requested to change the transfer method
-    this.socket.on('set transfer method', (method : string) => {
-      debug('Setting transfer method to', method);
-
-      this.method = method;
-    });
-
-    // Our partner has successfully selected a file and confirmed the action
-    this.socket.on('partner selected file', () => {
-      this.openPage('/transfer');
-      analytics("partner-selected-file");
-      this.downloadFiles();
-    });
-
-    // Partner disconnected from our transfer
-    this.socket.on('partner disconnected', () => {
-      debug('Partner disconnected from this transfer');
-      analytics("partner-disconnected");
-      if (!this.finishedTransfer) {
-        this.openPage('/disconnected');
-      }
-    });
-
-    // Set text to be shown on the transfer page
-    this.socket.on('proxy to partner', (data : {
-      type : string,
-      [key : string] : any
-    }) => {
-      if (data.type && data.type === "transferStatusText") {
-        debug('Got transfer status text', data.text);
-        
-        that.transferStatusText = data.text;
-        that.triggerUpdate();
-      }
-    });
-  }
+  connection : Connection;
 
   /**
    * Prepare the transfer
    */
   constructor() {
-    // Connect to socket.io server
-    if (process.env.NODE_ENV === 'development') {
-      this.socket = socket('localhost:8080');
-    } else {
-      this.socket = socket();
-    }
-    this.initSocket();
-
-    // Ask socket server to give us a new receiver ID
-    this.socket.emit('new receiver id', this.method, (id: number) => {
-      debug('Received own ID', id);
-      analytics("generated-id");
-
-      this.receiverId = id;
-
-      this.triggerUpdate();
-    });
+    this.connection = new Connection(this);
   }
 
   /**
@@ -241,117 +119,7 @@ export default class Transfer {
       return;
     }
 
-    // Ask the server to connect us the the other peer
-    this.socket.emit('use receiver id', id, this.method, (response : boolean, method : string) => {
-      if (response === true) {
-        // Server informed us that the other peer is valid and listening
-        debug('Is valid ID, using', id, method);
-        analytics("entered-valid-id");
-
-        this.isSender = true;
-        this.receiverId = id;
-        this.method = method;
-
-        this.openPage('/connecting');
-
-        this.connectPeers();
-      } else {
-        analytics("entered-invalid-id");
-        this.isValidId = false;
-        this.triggerUpdate();
-        debug('Invalid ID');
-      }
-    });
-  }
-
-  /**
-   * Lock transfer
-   * When selecting files on iOS, the browser will close the socket
-   * connection after a few seconds. This is why the browser will
-   * "lock" the transfer, allowing the iOS device to reconnect
-   * after selecting a file
-   */
-  lockTransfer() {
-    debug("Locking transfer")
-    this.socket.emit('lock transfer', this.receiverId);
-  }
-
-  /**
-   * Connect to the other peer using WebRTC or socket
-   */
-  connectPeers() {
-    debug('Connecting peers');
-
-    const openFileSelect = () => {
-      this.openPage('/select-file');
-
-      if (this.isSender) {
-        this.lockTransfer();
-
-        // Automatically open file selection popup
-        setTimeout(() => {
-          const input : HTMLInputElement | null = document.querySelector('input[type=file]');
-          if(input) {
-            input.click();
-          }
-        }, 500);
-      }
-    };
-
-    if (this.method === 'webrtc') {
-      // Helper: Fallback to socket connection if WebRTC fails
-      const fallbackToSockets = () => {
-        this.method = 'socket';
-        this.socket.emit('set transfer method', 'socket', this.receiverId);
-        openFileSelect();
-      }
-
-      // Setup our own WebRTC Peer
-      this.peer = new SimplePeer({
-        initiator: this.isSender,
-        trickle: false,
-        objectMode: true,
-      });
-
-      let abortConnection: NodeJS.Timeout | number;
-
-      // Listen to events on our peer
-      this.peer.on('signal', (data: object) => {
-        debug('Got signal from peer: ', data);
-
-        this.peerSignal = data;
-
-        // Abort connection if not connected after 3 seconds
-        abortConnection = setTimeout(() => {
-          if (!this.isSender) {
-            debug('Peer connection timed out, using sockets instead');
-            fallbackToSockets();
-          }
-        }, 3000);
-
-        debug('Sending back peer signal');
-        this.socket.emit('set peer signal', data, this.receiverId, this.isSender);
-      });
-      // We are successfully connected to the other peer
-      this.peer.on('connect', () => {
-        debug('Connected to peer');
-
-        clearTimeout(abortConnection as NodeJS.Timeout);
-        openFileSelect();
-      });
-      // There was an error while connecting to the other peer
-      // Probably a problem with the network so fall back to using sockets instead
-      this.peer.on('error', (err: any) => {
-        debug('Got error while connecting WebRTC', err);
-
-        fallbackToSockets();
-      });
-    } else {
-      // Transfer method is sockets
-      // We are already connected over sockets - simply continue
-      debug("Using Sockets to transfer so we don't need to connect");
-      openFileSelect();
-    }
+    this.connection.useReceiverId(id);
   }
 
   /**
@@ -369,10 +137,7 @@ export default class Transfer {
    */
   setTransferStatusText(text : String) {
     this.transferStatusText = text;
-    this.socket.emit('proxy to partner', this.receiverId, {
-      type: 'transferStatusText',
-      text
-    });
+    this.connection.sendTransferStatusText();
     this.triggerUpdate();
   }
 
@@ -388,14 +153,8 @@ export default class Transfer {
 
     analytics("start-upload");
 
-    // Reconnect to current transfer if disconnected
-    // See comment under "this.lockTransfer"
-    this.socket.emit('reconnect', this.socketId, this.receiverId);
-    debug("Reconnected to socket if connection was lost during file selection");
-
-    // Inform partner that we have selected a file and will begin transfer
-    this.socket.emit('selected file', this.receiverId);
-    debug("Informed partner about our file selection");
+    // Prepare our partner for the file transfer
+    this.connection.prepareUpload();
 
     this.setTransferStatusText("Preparing transfer...");
 
@@ -415,7 +174,7 @@ export default class Transfer {
     debug("Starting Upload Service");
     const service = new UploadService(this, this.uploadProvider);
     await service.startUpload();
-    this.disconnectAll();
+    this.connection.disconnectAll();
   }
 
   /**
@@ -429,17 +188,6 @@ export default class Transfer {
     debug("Starting download service");
     const service = new DownloadService(this);
     await service.startDownload();
-    this.disconnectAll();
-  }
-
-  /**
-   * Disconnect from connections so we don't accidentally trigger some events
-   */
-  disconnectAll() {
-    debug("Disconnecting all connnections");
-    // this.socket.disconnect();
-    if(this.peer) {
-      this.peer.destroy();
-    }
+    this.connection.disconnectAll();
   }
 }

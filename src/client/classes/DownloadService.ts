@@ -155,9 +155,9 @@ export default class DownloadService {
     if ((data as BufferLike)._isBuffer) {
       this.addFileChunk((data as BufferLike).buffer, true);
 
-      if (this.transfer.method === "webrtc") {
+      if (this.transfer.connection.method === "webrtc") {
         debug("Acknowledging data received via RTC");
-        this.transfer.socket.emit("acknowledge rtc data", this.transfer.receiverId);
+        this.transfer.connection.socket.emit("acknowledge rtc data", this.transfer.receiverId);
       }
 
       return;
@@ -199,7 +199,7 @@ export default class DownloadService {
     } else if (message.type === 'time estimate') {
       this.transfer.estimate = message.estimate as number;
     } else if (message.type === 'use transfer method') {
-      this.transfer.method = message.method as string;
+      this.transfer.connection.method = message.method as string;
     } else if (message.type === 'use processor') {
       switch(message.processor) {
         case 'DefaultProcessor':
@@ -227,15 +227,15 @@ export default class DownloadService {
     return new Promise(resolve => {
       this.onDownloadDone = resolve;
 
-      if (this.transfer.method === 'webrtc') {
-        if (!this.transfer.peer) {
+      if (this.transfer.connection.method === 'webrtc') {
+        if (!this.transfer.connection.peer) {
           throw new Error('Internal Error: Peer is undefined');
         }
-        this.transfer.peer.on('data', async (response: string | BufferLike | TransferControlMessage) => {
+        this.transfer.connection.peer.on('data', async (response: string | BufferLike | TransferControlMessage) => {
           await this.handleData(response);
         });
       }
-      this.transfer.socket.on('proxy to partner', this.handleData);
+      this.transfer.connection.socket.on('proxy to partner', this.handleData);
   
       this.hasDownloadedFiles = true;
     });

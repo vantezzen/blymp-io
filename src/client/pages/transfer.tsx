@@ -46,7 +46,7 @@ const Transfer = ({ transfer } : PropsWithTransfer) => (
         <br />
         {`File ${transfer.currentFile + 1} of ${transfer.totalFiles}`}
         <br />
-        {`Using ${transfer.method === 'webrtc' ? 'WebRTC' : 'WebSockets'} transfer`}
+        {`Using ${transfer.connection.method === 'webrtc' ? 'WebRTC' : 'WebSockets'} transfer`}
       </p>
     </Section>
   </div>

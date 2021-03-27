@@ -16,9 +16,14 @@ export default interface UploadProvider {
   /**
    * Get information about a file in the file list
    * 
+   * This function will be called once *before* this file got prepared. This way, blymp can already
+   * show the name of the new file while the provider prepares the file.
+   * The provider might return incorrect, temporary or generic information in this first call
+   * 
    * @param index Index of the file
+   * @param beforePrepare Is this call being performed before the file was prepared?
    */
-  getFileInfo(index : number) : TransferFile;
+  getFileInfo(index : number, beforePrepare : boolean) : TransferFile;
 
   /**
    * Get a slice of a file

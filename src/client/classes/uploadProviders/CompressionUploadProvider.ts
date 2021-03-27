@@ -48,12 +48,15 @@ export default class CompressionUploadProvider implements UploadProvider {
     return this.provider.getNumberOfFiles();
   }
 
-  getFileInfo(index: number): TransferFile {
-    if (!this.compressedFile) {
+  getFileInfo(index: number, beforePrepare : boolean): TransferFile {
+    if (!this.compressedFile && !beforePrepare) {
       throw new Error('Internal error: Compressed file does not exist yet');
     }
 
-    const generalInfo = this.provider.getFileInfo(index);
+    const generalInfo = this.provider.getFileInfo(index, beforePrepare);
+    if (beforePrepare || !this.compressedFile) {
+      return generalInfo;
+    }
     return {
       ...generalInfo,
       size: this.compressedFile.byteLength
@@ -78,7 +81,7 @@ export default class CompressionUploadProvider implements UploadProvider {
       // Read the whole file from the wrapped provider
       debug("Reading file into RAM");
       await this.provider.prepareFile(index);
-      const fileInfo = this.provider.getFileInfo(index);
+      const fileInfo = this.provider.getFileInfo(index, false);
       const fileContent = await this.provider.getFileSlice(index, 0, fileInfo.size);
       debug("File read done, compressing file now");
 
