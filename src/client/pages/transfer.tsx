@@ -40,8 +40,12 @@ const Transfer = ({ transfer } : PropsWithTransfer) => (
       />
       <h2>{ transfer.transferStatusText }</h2>
       <p style={{ color: '#B4B4B4', lineHeight: 2 }}>
-        {`${formatSeconds(transfer.estimate)} left for this file`}
-        <br />
+        {transfer.estimate !== -1 && (
+          <>
+            {`${formatSeconds(transfer.estimate)} left for this file`}
+            <br />
+          </>
+        )}
         {`Currently transferring "${transfer.currentFileName}"`}
         <br />
         {`File ${transfer.currentFile + 1} of ${transfer.totalFiles}`}

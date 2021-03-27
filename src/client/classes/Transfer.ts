@@ -72,7 +72,7 @@ export default class Transfer {
    * Estimated time needed for the transfer to be completed in seconds
    * @type Integer
    */
-  estimate: number = 10;
+  estimate: number = -1;
 
   /**
    * Number between 0-100, indicating the progress of the transfer of the current file
@@ -100,8 +100,8 @@ export default class Transfer {
   }
 
   /**
-   * Try to use the receiver ID input into the page
-   * @param {number} id Receiver ID
+   * Try to connect to a client using the 4-digit code
+   * @param {number} id Receiver ID (4-digit code)
    */
   useReceiver(id: number) {
     // Reset ID to valid so we can replay the invalid animation if needed

@@ -276,6 +276,11 @@ export default class UploadService {
           type: 'file complete',
         });
 
+        // Reset estimates
+        this.transfer.estimate = -1;
+        this.lastEstimates = [];
+        this.transfer.triggerUpdate();
+
         // Check if all files have been transmitted
         if (this.transfer.currentFile >= this.uploadProvider.getNumberOfFiles()) {
           // Finish transfer
