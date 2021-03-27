@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import debugging from 'debug';
 import Sync from 'react-ionicons/lib/IosSync';
 
 import Heading from '../components/Heading';
@@ -8,6 +9,8 @@ import Spacer from '../components/Spacer';
 import Transfer from '../classes/Transfer';
 import { PropsWithTransfer } from '../types';
 import FileInputUploadProvider from '../classes/uploadProviders/FileInputUploadProvider';
+
+const debug = debugging("blymp:SelectFilePage");
 
 const SelectFile = ({ transfer } : PropsWithTransfer) => (
   <div>
@@ -24,12 +27,17 @@ const SelectFile = ({ transfer } : PropsWithTransfer) => (
             id="files"
             multiple
             onChange={(event) => {
+              debug("Selected files");
               if (!event.target.files) {
                 throw new Error('View error: No files');
               }
 
+              debug("Creating new FileInputUploadProvider file selected files");
+
               // eslint-disable-next-line no-param-reassign
               const provider = new FileInputUploadProvider(event.target.files);
+
+              debug("Setting newly created Provider as current upload provider");
 
               transfer.uploadProvider = provider;
               transfer.triggerUpdate();

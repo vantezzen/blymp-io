@@ -233,15 +233,31 @@ module.exports = function setupSockets(io) {
       }
 
       if (id && transfers[id]) {
-        if (transfers[id].sender !== socket.id) return;
+        let sendTo = transfers[id].receiver;
 
-        io.to(transfers[id].receiver).emit('proxy to partner', data);
+        if (transfers[id].sender !== socket.id) {
+          sendTo = transfers[id].sender;
+        }
+
+        io.to(sendTo).emit('proxy to partner', data);
 
         transfers[id].lastActivity = (+new Date());
 
         if (callback) {
           callback();
         }
+      }
+    });
+
+    socket.on('acknowledge rtc data', (id) => {
+      if (isShadowBanned) {
+        return;
+      }
+
+      if (id && transfers[id]) {
+        io.to(transfers[id].sender).emit('acknowledge rtc data');
+
+        transfers[id].lastActivity = (+new Date());
       }
     });
 

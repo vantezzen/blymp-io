@@ -1,6 +1,10 @@
 import pako from 'pako';
+import debugging from 'debug';
 import { TransferFile } from "../../types";
 import UploadProvider from "./UploadProvider";
+import Transfer from '../Transfer';
+
+const debug = debugging("blymp:CompressionUploadProvider");
 
 /**
  * Compression Upload Provider: This provider wraps around other Upload Providers
@@ -15,12 +19,19 @@ export default class CompressionUploadProvider implements UploadProvider {
   private provider : UploadProvider;
 
   /**
+   * Current parent transfer
+   */
+  private transfer : Transfer;
+
+  /**
    * Data for the compressed file
    */
   private compressedFile : Uint8Array | undefined;
 
-  constructor(provider : UploadProvider) {
+  constructor(provider : UploadProvider, transfer : Transfer) {
+    debug("Created Compression Wrapper for provider", provider);
     this.provider = provider;
+    this.transfer = transfer;
   }
 
   getEstimatedTotalSize(): number {
@@ -59,19 +70,26 @@ export default class CompressionUploadProvider implements UploadProvider {
   }
 
   prepareFile(index: number): Promise<void> {
+    debug("Compressing file before transfer");
+
+    this.transfer.setTransferStatusText("Compressing file before sending...");
+
     return new Promise(async (resolve : Function) => {
       // Read the whole file from the wrapped provider
+      debug("Reading file into RAM");
       await this.provider.prepareFile(index);
       const fileInfo = this.provider.getFileInfo(index);
       const fileContent = await this.provider.getFileSlice(index, 0, fileInfo.size);
+      debug("File read done, compressing file now");
 
       // Compress it using pako
       const data = new Uint8Array(fileContent as ArrayBufferLike);
       this.compressedFile = pako.deflate(data);
+      debug("File compression done");
+
+      this.transfer.setTransferStatusText("Transferring compressed file...");
 
       resolve();
     });
   }
-
-  
 }

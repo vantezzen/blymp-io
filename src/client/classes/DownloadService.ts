@@ -48,12 +48,19 @@ export default class DownloadService {
   private hasDownloadedFiles = false;
 
   /**
+   * Function to call after all files have been transferred
+   */
+  private onDownloadDone : Function = () => {};
+
+  /**
    * Create a new Download Service
    * 
    * @param transfer Transfer instance parenting this service
    */
   constructor(transfer : Transfer) {
     this.transfer = transfer;
+
+    this.handleData = this.handleData.bind(this);
   }
 
   /**
@@ -114,7 +121,7 @@ export default class DownloadService {
 
     // Preprocess the file if we have a processor to do so
     if (this.processor) {
-      blob = await this.processor.process(blob);
+      blob = await this.processor.process(blob, this.transfer);
     }
 
     // Save the file to disk
@@ -133,6 +140,7 @@ export default class DownloadService {
     if (this.filesLeft === 0) {
       // We have successfully transferred all files
       this.transfer.finishedTransfer = true;
+      this.onDownloadDone();
       this.transfer.openPage('/completed');
     }
   }
@@ -146,6 +154,12 @@ export default class DownloadService {
     // eslint-disable-next-line no-underscore-dangle
     if ((data as BufferLike)._isBuffer) {
       this.addFileChunk((data as BufferLike).buffer, true);
+
+      if (this.transfer.method === "webrtc") {
+        debug("Acknowledging data received via RTC");
+        this.transfer.socket.emit("acknowledge rtc data", this.transfer.receiverId);
+      }
+
       return;
     } if (typeof data === 'string') {
       // Test if is file chunk
@@ -210,16 +224,20 @@ export default class DownloadService {
       throw new Error('Illegal state: DownloadService can only be used once! Please create a new instance instead');
     }
 
-    if (this.transfer.method === 'webrtc') {
-      if (!this.transfer.peer) {
-        throw new Error('Internal Error: Peer is undefined');
-      }
-      this.transfer.peer.on('data', (response: string | BufferLike | TransferControlMessage) => {
-        this.handleData(response);
-      });
-    }
-    this.transfer.socket.on('proxy to partner', this.handleData);
+    return new Promise(resolve => {
+      this.onDownloadDone = resolve;
 
-    this.hasDownloadedFiles = true;
+      if (this.transfer.method === 'webrtc') {
+        if (!this.transfer.peer) {
+          throw new Error('Internal Error: Peer is undefined');
+        }
+        this.transfer.peer.on('data', async (response: string | BufferLike | TransferControlMessage) => {
+          await this.handleData(response);
+        });
+      }
+      this.transfer.socket.on('proxy to partner', this.handleData);
+  
+      this.hasDownloadedFiles = true;
+    });
   }
 }

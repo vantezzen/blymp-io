@@ -38,7 +38,7 @@ const Transfer = ({ transfer } : PropsWithTransfer) => (
           borderRadius: 15,
         }}
       />
-      <h2>Transferring files...</h2>
+      <h2>{ transfer.transferStatusText }</h2>
       <p style={{ color: '#B4B4B4', lineHeight: 2 }}>
         {`${formatSeconds(transfer.estimate)} left for this file`}
         <br />

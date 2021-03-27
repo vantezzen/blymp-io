@@ -117,9 +117,16 @@ export default class Transfer {
   uploadProvider : UploadProvider | undefined;
 
   /**
+   * Text that should be shown on the "transfer" page
+   */
+  transferStatusText : String = "Transferring files...";
+
+  /**
    * Initialize the socket to listen for status changes
    */
   initSocket() {
+    const that = this;
+
     this.socket.on('connect', () => {
       debug('Connected socket');
 
@@ -176,6 +183,19 @@ export default class Transfer {
         this.openPage('/disconnected');
       }
     });
+
+    // Set text to be shown on the transfer page
+    this.socket.on('proxy to partner', (data : {
+      type : string,
+      [key : string] : any
+    }) => {
+      if (data.type && data.type === "transferStatusText") {
+        debug('Got transfer status text', data.text);
+        
+        that.transferStatusText = data.text;
+        that.triggerUpdate();
+      }
+    });
   }
 
   /**
@@ -217,6 +237,7 @@ export default class Transfer {
       this.isValidId = false;
       this.triggerUpdate();
       analytics("connected-to-self");
+      debug("Tried to connect to self - aborting");
       return;
     }
 
@@ -251,6 +272,7 @@ export default class Transfer {
    * after selecting a file
    */
   lockTransfer() {
+    debug("Locking transfer")
     this.socket.emit('lock transfer', this.receiverId);
   }
 
@@ -327,6 +349,7 @@ export default class Transfer {
     } else {
       // Transfer method is sockets
       // We are already connected over sockets - simply continue
+      debug("Using Sockets to transfer so we don't need to connect");
       openFileSelect();
     }
   }
@@ -342,9 +365,23 @@ export default class Transfer {
   }
 
   /**
+   * Set text for transfer status and inform partner to show the same text
+   */
+  setTransferStatusText(text : String) {
+    this.transferStatusText = text;
+    this.socket.emit('proxy to partner', this.receiverId, {
+      type: 'transferStatusText',
+      text
+    });
+    this.triggerUpdate();
+  }
+
+  /**
    * Upload the currently selected files to our partner
    */
-  uploadFiles() {
+  async uploadFiles() {
+    debug("Starting upload");
+
     if (!this.uploadProvider) {
       throw new Error('Internal error: Cannot upload data as no upload provider was set');
     }
@@ -354,9 +391,13 @@ export default class Transfer {
     // Reconnect to current transfer if disconnected
     // See comment under "this.lockTransfer"
     this.socket.emit('reconnect', this.socketId, this.receiverId);
+    debug("Reconnected to socket if connection was lost during file selection");
 
     // Inform partner that we have selected a file and will begin transfer
     this.socket.emit('selected file', this.receiverId);
+    debug("Informed partner about our file selection");
+
+    this.setTransferStatusText("Preparing transfer...");
 
     // Open the transfer page that shows the current status of the transfer
     this.openPage('/transfer');
@@ -364,24 +405,41 @@ export default class Transfer {
     // Add compression if the file size is over 10kb but under 1GB
     if (
       this.uploadProvider.getEstimatedTotalSize() > (1024 * 10) && 
-      this.uploadProvider.getEstimatedTotalSize() > (1024 * 1024 * 1024)
+      this.uploadProvider.getEstimatedTotalSize() < (1024 * 1024 * 1024)
     ) {
-      this.uploadProvider = new CompressionUploadProvider(this.uploadProvider);
+      debug("Adding Compression Provider as we are in the right range");
+      this.uploadProvider = new CompressionUploadProvider(this.uploadProvider, this);
     }
 
     // The UploadService is doing all the work of actually transmitting the data
+    debug("Starting Upload Service");
     const service = new UploadService(this, this.uploadProvider);
-    service.startUpload();
+    await service.startUpload();
+    this.disconnectAll();
   }
 
   /**
    * Handle downloading and saving the files
    */
-  downloadFiles() {
+  async downloadFiles() {
+    debug("Starting download");
     analytics("start-download");
 
     // Create a DownloadService to handle actually receiving the data
+    debug("Starting download service");
     const service = new DownloadService(this);
-    service.startDownload();
+    await service.startDownload();
+    this.disconnectAll();
+  }
+
+  /**
+   * Disconnect from connections so we don't accidentally trigger some events
+   */
+  disconnectAll() {
+    debug("Disconnecting all connnections");
+    // this.socket.disconnect();
+    if(this.peer) {
+      this.peer.destroy();
+    }
   }
 }

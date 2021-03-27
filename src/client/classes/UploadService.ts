@@ -50,6 +50,11 @@ export default class UploadService {
   estimateInterval : number | NodeJS.Timeout | undefined;
 
   /**
+   * Function to call after all files have been transferred
+   */
+   private onUploadDone : Function = () => {};
+
+  /**
    * Create a new upload service
    * 
    * @param transfer Transfer that parents this service
@@ -79,6 +84,9 @@ export default class UploadService {
       if (isFilePart) {
         try {
           this.transfer.peer.send(data as SimplePeerData);
+          if (callback) {
+            this.transfer.socket.once("acknowledge rtc data", callback);
+          }
         } catch (e) {
           debug('Peer connection has been reset - falling back to sockets');
 
@@ -96,6 +104,9 @@ export default class UploadService {
       } else {
         try {
           this.transfer.peer.send(JSON.stringify(data));
+          if (callback) {
+            callback();
+          }
         } catch (e) {
           debug('Peer connection has been reset - falling back to sockets');
 
@@ -110,9 +121,6 @@ export default class UploadService {
           this.emit(data, isFilePart, callback);
           return;
         }
-      }
-      if (callback) {
-        callback();
       }
     } else if (isFilePart) {
       this.transfer.socket.emit('proxy to partner', this.transfer.receiverId, `###${data}`, callback);
@@ -224,6 +232,8 @@ export default class UploadService {
     // Read and handle the chunk
     const start = position * this.chunkSize;
     const end = start + Math.min(this.chunkSize, (fileInfo.size - start));
+
+    debug("Requesting new file slice from provider");
     this.uploadProvider.getFileSlice(this.transfer.currentFile, start, end).then((v) => this.handleFileSlice(v));
   }
 
@@ -234,6 +244,8 @@ export default class UploadService {
    * @param value Value of the file slice
    */
   private handleFileSlice(value : string | ArrayBuffer) {
+    debug("Got new file slice");
+
     let data : String | ArrayBuffer = '';
 
     if (this.transfer.method === 'socket') {
@@ -248,7 +260,10 @@ export default class UploadService {
     }
 
     // Send file chunk to partner
+    debug("Transmitting to partner...");
     this.emit(data, true, () => {
+      debug("Transmission successful");
+
       this.transmitted += this.chunkSize;
 
       // Check if file transmitted completely
@@ -269,6 +284,7 @@ export default class UploadService {
           // Finish transfer
           debug('Finished transferring all files');
           this.transfer.finishedTransfer = true;
+          this.onUploadDone();
           this.transfer.openPage('/completed');
           clearInterval(this.estimateInterval as number);
           return;
@@ -299,28 +315,34 @@ export default class UploadService {
       throw new Error('Illegal state: UploadService can only be used once! Please create a new instance instead');
     }
 
-    // Inform partner which DownloadProcessor they should use
-    this.emit({
-      type: 'use processor',
-      processor: this.uploadProvider.getDownloadProcessor()
+    return new Promise(resolve => {
+      this.onUploadDone = resolve;
+
+      this.transfer.setTransferStatusText("Transferring files...");
+  
+      // Inform partner which DownloadProcessor they should use
+      this.emit({
+        type: 'use processor',
+        processor: this.uploadProvider.getDownloadProcessor()
+      });
+  
+      // Inform partner about number of files
+      this.emit({
+        type: 'number of files',
+        num: this.uploadProvider.getNumberOfFiles()
+      });
+  
+      // Total number of files we need to transfer
+      this.transfer.totalFiles = this.uploadProvider.getNumberOfFiles();
+      this.transfer.progress = 0;
+  
+      // Start estimating the time remaining
+      this.estimateInterval = setInterval(() => this.updateEstimate(), 50);
+  
+      this.transfer.triggerUpdate();
+  
+      // Start file transfer
+      this.sendFileData(0);
     });
-
-    // Inform partner about number of files
-    this.emit({
-      type: 'number of files',
-      num: this.uploadProvider.getNumberOfFiles()
-    });
-
-    // Total number of files we need to transfer
-    this.transfer.totalFiles = this.uploadProvider.getNumberOfFiles();
-    this.transfer.progress = 0;
-
-    // Start estimating the time remaining
-    this.estimateInterval = setInterval(() => this.updateEstimate(), 50);
-
-    this.transfer.triggerUpdate();
-
-    // Start file transfer
-    this.sendFileData(0);
   }
 }

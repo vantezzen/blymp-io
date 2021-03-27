@@ -1,5 +1,8 @@
+import debugging from 'debug';
 import { TransferFile } from "../../types";
 import UploadProvider from "./UploadProvider";
+
+const debug = debugging("blymp:FileInputUploadProvider");
 
 /**
  * File Input Provider allows sending data from a <input type="file"> element.
@@ -22,6 +25,8 @@ export default class FileInputUploadProvider implements UploadProvider {
   private currentResolver : ((buffer : string | ArrayBuffer) => any) | undefined;
 
   constructor(files : FileList) {
+    debug("Creating new Upload Provider for file list");
+
     this.selectedFiles = files;
     this.reader = new FileReader();
 
@@ -33,6 +38,7 @@ export default class FileInputUploadProvider implements UploadProvider {
         throw new Error('Internal error: FileInputUploadProvider does not have a current resolver');
       }
 
+      debug("Read new file part - informing resolver");
       this.currentResolver(readerEvent.target.result);
 
       // Remove the resolver as it has already been used
@@ -47,11 +53,14 @@ export default class FileInputUploadProvider implements UploadProvider {
       size += this.selectedFiles[i].size;
     }
 
+    debug("Estimating size to be ", size, "bytes");
+
     return size;
   }
 
   prepareFile(_: number): Promise<void> {
     // This provider doesn't need to do any preperations
+    debug("Preparing file - nothing to prepare");
     return Promise.resolve();
   }
 
@@ -59,6 +68,8 @@ export default class FileInputUploadProvider implements UploadProvider {
     if (this.currentResolver !== undefined) {
       throw new Error('Internal error: Tried to start new read operation before current read finished');
     }
+
+    debug("Starting file reader for new slice");
     
     // Return an empty promise but save the resolver. This way we can later resolve this promise using our reader's
     // "onload" event
