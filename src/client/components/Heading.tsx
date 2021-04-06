@@ -5,7 +5,11 @@ import { Link } from 'react-router-dom';
 
 import Spacer from './Spacer';
 
-const Heading = ({ fullSize }) => (
+type HeadingProps = {
+  fullSize: boolean
+}
+
+const Heading = ({ fullSize } : HeadingProps) => (
   <div className="heading">
     <Link to="/">
       <Planet
@@ -15,7 +19,11 @@ const Heading = ({ fullSize }) => (
     </Link>
     {fullSize && (
       <>
-        <h1>blymp.io</h1>
+        <h1>
+          {window.location.hostname.includes('next.blymp.io') ? (
+            <span style={{ fontFamily: 'monospace', fontWeight: 'lighter' }}>next.blymp.io</span>
+          ) : 'blymp.io'}
+        </h1>
         <p style={{ color: '#B4B4B4', marginTop: 0 }}>Transfer files between any device</p>
       </>
     )}

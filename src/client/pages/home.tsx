@@ -16,13 +16,14 @@ import TransferImg from '../assets/tutorial-transfer.svg';
 import faqContent from '../assets/faq-content';
 
 import './home.css';
+import { PropsWithTransfer } from '../types';
 
-const Heading = React.lazy(() => import('../components/Heading'));
-const InfoCircle = React.lazy(() => import('react-ionicons/lib/IosWarningOutline'));
-const CodeInput = React.lazy(() => import('react-code-input'));
-const Faq = React.lazy(() => import('react-faq-component'));
+const Heading = React.lazy(() => import(/* webpackChunkName: "components-heading" */ '../components/Heading'));
+const InfoCircle = React.lazy(() => import(/* webpackChunkName: "ionicons-info-circle" */ 'react-ionicons/lib/IosWarningOutline'));
+const CodeInput = React.lazy(() => import(/* webpackChunkName: "react-code-input" */ 'react-code-input'));
+const Faq = React.lazy(() => import(/* webpackChunkName: "react-faq-component" */ 'react-faq-component'));
 
-const Home = ({ transfer }) => (
+const Home = ({ transfer } : PropsWithTransfer) => (
   <div>
     <Suspense fallback={<div />}>
       <Heading fullSize />
@@ -56,6 +57,8 @@ const Home = ({ transfer }) => (
           <Suspense fallback={<div />}>
             <CodeInput
               type="number"
+              name="receiverId"
+              inputMode="numeric"
               fields={4}
               className="code-input"
               value={transfer.receiverId ? String(transfer.receiverId) : ''}
@@ -98,10 +101,12 @@ const Home = ({ transfer }) => (
         <Suspense fallback={<div />}>
           <CodeInput
             type="number"
+            name="senderId"
+            inputMode="numeric"
             fields={4}
             className="code-input"
             autoFocus
-            onChange={id => transfer.useReceiver(id)}
+            onChange={id => transfer.useReceiver(Number(id))}
             inputStyleInvalid={{
               animation: 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both',
             }}
@@ -137,6 +142,9 @@ const Home = ({ transfer }) => (
         <h2>Why blymp.io</h2>
 
         <Checktext>
+          Very fast
+        </Checktext>
+        <Checktext>
           No registration
         </Checktext>
         <Checktext>
@@ -153,6 +161,26 @@ const Home = ({ transfer }) => (
     </div>
 
     <Separator />
+
+    {window.location.hostname.includes('next.blymp.io') && (
+      <>
+        <Section>
+          <div style={{ margin: 30 }}>
+            <h2>Welcome to next.blymp.io!</h2>
+            <p>
+              Thank you for testing the newest features of blymp.io.<br />
+              If you find any bugs or have other feedback, please post it on <a href="https://github.com/vantezzen/blymp-io/issues">https://github.com/vantezzen/blymp-io/issues</a>.
+            </p>
+            <p>
+              Please keep in mind that this site runs independent from the normal blymp.io,<br />
+              meaning that the 4-digit codes from the normal blymp.io won't work here and vice versa. 
+            </p>
+          </div>
+        </Section>
+
+        <Spacer size="3rem" />
+      </>
+    )}
 
     <h2 id="how-it-works">How it works</h2>
     <div className="feature">

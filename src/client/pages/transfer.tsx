@@ -5,11 +5,12 @@ import { Line } from 'rc-progress';
 import Heading from '../components/Heading';
 import Section from '../components/Section';
 import TransferClass from '../classes/Transfer';
+import { PropsWithTransfer } from '../types';
 
-const roundToOneDecimal = num => Math.round(num * 10) / 10;
+const roundToOneDecimal = (num : number) => Math.round(num * 10) / 10;
 
 // Format seconds into a better-readable format like hours or minutes
-const formatSeconds = (seconds) => {
+const formatSeconds = (seconds : number) => {
   if (seconds > 3600) {
     return `${roundToOneDecimal(seconds / 3600)}h`;
   }
@@ -19,7 +20,7 @@ const formatSeconds = (seconds) => {
   return `${seconds}s`;
 };
 
-const Transfer = ({ transfer }) => (
+const Transfer = ({ transfer } : PropsWithTransfer) => (
   <div>
     <Heading />
 
@@ -37,15 +38,19 @@ const Transfer = ({ transfer }) => (
           borderRadius: 15,
         }}
       />
-      <h2>Transferring files...</h2>
+      <h2>{ transfer.transferStatusText }</h2>
       <p style={{ color: '#B4B4B4', lineHeight: 2 }}>
-        {`${formatSeconds(transfer.estimate)} left for this file`}
-        <br />
+        {transfer.estimate !== -1 && (
+          <>
+            {`${formatSeconds(transfer.estimate)} left for this file`}
+            <br />
+          </>
+        )}
         {`Currently transferring "${transfer.currentFileName}"`}
         <br />
-        {`File ${transfer.currentFile} of ${transfer.totalFiles}`}
+        {`File ${transfer.currentFile + 1} of ${transfer.totalFiles}`}
         <br />
-        {`Using ${transfer.method === 'webrtc' ? 'WebRTC' : 'WebSockets'} transfer`}
+        {`Using ${transfer.connection.method === 'webrtc' ? 'WebRTC' : 'WebSockets'} transfer`}
       </p>
     </Section>
   </div>

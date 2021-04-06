@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Checkmark from 'react-ionicons/lib/IosCheckmarkCircle';
+import { ChildrenProps } from '../types';
 
-const Checktext = ({ children }) => (
+const Checktext = ({ children } : ChildrenProps) => (
   <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10 }}>
     <Checkmark 
       fontSize="25"

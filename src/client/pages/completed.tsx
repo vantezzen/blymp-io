@@ -6,7 +6,11 @@ import Heading from '../components/Heading';
 import Section from '../components/Section';
 import bmcLogo from '../assets/bmc.png';
 
-const Completed = ({ newTransfer }) => (
+type CompletedProps = {
+  newTransfer: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+}
+
+const Completed = ({ newTransfer } : CompletedProps) => (
   <div>
     <Heading />
 

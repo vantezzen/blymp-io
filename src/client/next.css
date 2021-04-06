@@ -1,0 +1,12 @@
+/* 
+  Stylesheet for next.blymp.io
+*/
+body {
+  background-color: #1b1b1b;
+}
+.section {
+  background-color: #202020;
+}
+.code-input input {
+  background-color: #303030 !important;
+}

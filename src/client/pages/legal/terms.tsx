@@ -61,7 +61,7 @@ const Connecting = () => (
         apply to all visitors, users and others who wish to access or use Service.
       </p>
       <p>Thank you for being responsible.</p>
-      <ol start="2">
+      <ol start={2}>
         <li><strong><u>Communications</u></strong></li>
       </ol>
       <p>
@@ -69,7 +69,7 @@ const Connecting = () => (
         other information we may send. However, you may opt out of receiving any, or all, of these
         communications from us by following the unsubscribe link or by emailing at properly+blymp@pm.me.
       </p>
-      <ol start="3">
+      <ol start={3}>
         <li><strong><u>Contests, Sweepstakes and Promotions</u></strong></li>
       </ol>
       <p>
@@ -81,7 +81,7 @@ const Connecting = () => (
         the applicable rules&nbsp;as well as our Privacy Policy. If the rules for a Promotion conflict with
         these Terms of Service, Promotion rules will apply.
       </p>
-      <ol start="4">
+      <ol start={4}>
         <li><strong><u>Fee Changes</u></strong></li>
       </ol>
       <p>
@@ -97,11 +97,11 @@ const Connecting = () => (
         Your continued use of Service after Subscription fee change comes into effect constitutes your
         agreement to pay the modified Subscription fee amount.
       </p>
-      <ol start="5">
+      <ol start={5}>
         <li><strong><u>Refunds</u></strong></li>
       </ol>
       <p>We issue refunds for Contracts within seven (7) days of the original purchase of the Contract.</p>
-      <ol start="6">
+      <ol start={6}>
         <li><strong><u>Content</u></strong></li>
       </ol>
       <p>
@@ -139,7 +139,7 @@ const Connecting = () => (
         use said Content, whether in whole or in part, for commercial purposes or for personal gain, without
         express advance written permission from us.
       </p>
-      <ol start="7">
+      <ol start={7}>
         <li><strong><u>Prohibited Uses</u></strong></li>
       </ol>
       <p>
@@ -201,7 +201,7 @@ const Connecting = () => (
         <li>Take any action that may damage or falsify Company rating.</li>
         <li>Otherwise attempt to interfere with the proper working of Service.</li>
       </ul>
-      <ol start="8">
+      <ol start={8}>
         <li><strong><u>Analytics</u></strong></li>
       </ol>
       <p>We may use third-party Service Providers to monitor and analyze the use of our Service.</p>
@@ -240,7 +240,7 @@ const Connecting = () => (
           https://www.cloudflare.com/privacypolicy/
         </a>
       </p>
-      <ol start="9">
+      <ol start={9}>
         <li><strong><u>No Use By Minors</u></strong></li>
       </ol>
       <p>
@@ -250,7 +250,7 @@ const Connecting = () => (
         by all of the terms and conditions of Terms. If you are not at least eighteen (18) years old, you
         are prohibited from both the access and usage of Service.
       </p>
-      <ol start="10">
+      <ol start={10}>
         <li><strong><u>Accounts</u></strong></li>
       </ol>
       <p>
@@ -275,7 +275,7 @@ const Connecting = () => (
         We reserve the right to refuse service, terminate accounts, remove or edit content, or cancel orders
         in our sole discretion.
       </p>
-      <ol start="11">
+      <ol start={11}>
         <li><strong><u>Intellectual Property</u></strong></li>
       </ol>
       <p>
@@ -285,7 +285,7 @@ const Connecting = () => (
         trade dress may not be used in connection with any product or service without the prior written
         consent of&nbsp;blymp.io.
       </p>
-      <ol start="12">
+      <ol start={12}>
         <li><strong><u>Copyright Policy</u></strong></li>
       </ol>
       <p>
@@ -307,7 +307,7 @@ const Connecting = () => (
         or bad-faith claims on the infringement of any Content found on and/or through Service on your
         copyright.
       </p>
-      <ol start="13">
+      <ol start={13}>
         <li><strong><u>DMCA Notice and Procedure for Copyright Infringement Claims</u></strong></li>
       </ol>
       <p>
@@ -341,7 +341,7 @@ const Connecting = () => (
         </li>
       </ul>
       <p>You can contact our Copyright Agent via email at&nbsp;properly+blymp@pm.me</p>
-      <ol start="14">
+      <ol start={14}>
         <li><strong><u>Error Reporting and Feedback</u></strong></li>
       </ol>
       <p>
@@ -360,7 +360,7 @@ const Connecting = () => (
         modify, create derivative works, publish, distribute and commercialize) Feedback in any manner and
         for any purpose.
       </p>
-      <ol start="15">
+      <ol start={15}>
         <li><strong><u>Links To Other Web Sites</u></strong></li>
       </ol>
       <p>
@@ -382,7 +382,7 @@ const Connecting = () => (
         WE STRONGLY ADVISE YOU TO READ THE TERMS OF SERVICE AND PRIVACY POLICIES OF ANY THIRD PARTY WEB SITES
         OR SERVICES THAT YOU VISIT.
       </p>
-      <ol start="16">
+      <ol start={16}>
         <li><strong><u>Disclaimer Of Warranty </u></strong></li>
       </ol>
       <p>
@@ -411,7 +411,7 @@ const Connecting = () => (
         THE FOREGOING DOES NOT AFFECT ANY WARRANTIES WHICH CANNOT BE EXCLUDED OR LIMITED UNDER APPLICABLE
         LAW.
       </p>
-      <ol start="17">
+      <ol start={17}>
         <li><strong><u>Limitation Of Liability</u></strong></li>
       </ol>
       <p>
@@ -429,7 +429,7 @@ const Connecting = () => (
         PUNITIVE, INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO THE PRIOR LIMITATION OR EXCLUSION MAY NOT APPLY TO
         YOU.
       </p>
-      <ol start="18">
+      <ol start={18}>
         <li><strong><u>Termination</u></strong></li>
       </ol>
       <p>
@@ -443,7 +443,7 @@ const Connecting = () => (
         including, without limitation, ownership provisions, warranty disclaimers, indemnity and limitations
         of liability.
       </p>
-      <ol start="19">
+      <ol start={19}>
         <li><strong><u>Governing Law</u></strong></li>
       </ol>
       <p>
@@ -457,7 +457,7 @@ const Connecting = () => (
         agreement between us regarding our Service and supersede and replace any prior agreements we might
         have had between us regarding Service.
       </p>
-      <ol start="20">
+      <ol start={20}>
         <li><strong><u>Changes To Service</u></strong></li>
       </ol>
       <p>
@@ -466,7 +466,7 @@ const Connecting = () => (
         part of Service is unavailable at any time or for any period. From time to time, we may restrict
         access to some parts of Service, or the entire Service, to users, including registered users.
       </p>
-      <ol start="21">
+      <ol start={21}>
         <li><strong><u>Amendments To Terms</u></strong></li>
       </ol>
       <p>
@@ -483,7 +483,7 @@ const Connecting = () => (
         bound by the revised terms. If you do not agree to the new terms, you are no longer authorized to
         use Service.
       </p>
-      <ol start="22">
+      <ol start={22}>
         <li><strong><u>Waiver And Severability</u></strong></li>
       </ol>
       <p>
@@ -498,14 +498,14 @@ const Connecting = () => (
         the minimum extent such that the remaining provisions of Terms will continue in full force and
         effect.
       </p>
-      <ol start="23">
+      <ol start={23}>
         <li><strong><u>Acknowledgement</u></strong></li>
       </ol>
       <p>
         BY USING SERVICE OR OTHER SERVICES PROVIDED BY US, YOU ACKNOWLEDGE THAT YOU HAVE READ THESE TERMS OF
         SERVICE AND AGREE TO BE BOUND BY THEM.
       </p>
-      <ol start="24">
+      <ol start={24}>
         <li><strong><u>Contact Us</u></strong></li>
       </ol>
       <p>Please send your feedback, comments, requests for technical support:</p>

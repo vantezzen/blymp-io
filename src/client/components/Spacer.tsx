@@ -1,7 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Spacer = ({ size }) => (
+type SpacerProps = {
+  size: number | string,
+}
+
+const Spacer = ({ size } : SpacerProps) => (
   <div style={{ marginBottom: size }} />
 );
 

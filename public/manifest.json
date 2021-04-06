@@ -27,7 +27,7 @@
       "files": [
         {
           "name": "files",
-          "accept": "*"
+          "accept": "*/*"
         }
       ]
     }
