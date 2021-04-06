@@ -161,10 +161,10 @@ export default class Transfer {
     // Open the transfer page that shows the current status of the transfer
     this.openPage('/transfer');
 
-    // Add compression if the file size is over 10kb but under 1GB
+    // Add compression if the file size is over 10kb but under 100MB
     if (
       this.uploadProvider.getEstimatedTotalSize() > (1024 * 10) && 
-      this.uploadProvider.getEstimatedTotalSize() < (1024 * 1024 * 1024)
+      this.uploadProvider.getEstimatedTotalSize() < (1024 * 1024 * 100)
     ) {
       debug("Adding Compression Provider as we are in the right range");
       this.uploadProvider = new CompressionUploadProvider(this.uploadProvider, this);
