@@ -5,7 +5,6 @@
   "main": "src/server/index.js",
   "scripts": {
     "build": "webpack --mode production",
-    "postbuild": "react-snap && mv dist/index.html dist/index.orig.html && mv dist/200.html dist/index.html",
     "start": "node src/server/index.js",
     "heroku-prebuild": "npm install --dev",
     "client": "webpack-dev-server --mode development --devtool inline-source-map --hot",
@@ -85,16 +84,11 @@
     "html-webpack-plugin": "^5.0.0",
     "nodemon": "^1.17.3",
     "process": "^0.11.10",
-    "react-snap": "^1.23.0",
     "style-loader": "^2.0.0",
     "url-loader": "^1.0.1",
     "webpack": "^5.0.0",
     "webpack-cli": "^4.5.0",
     "webpack-dev-server": "^4.0.0-beta.0",
     "workbox-webpack-plugin": "^6.0.2"
-  },
-  "reactSnap": {
-    "source": "dist",
-    "skipThirdPartyRequests": true
   }
 }

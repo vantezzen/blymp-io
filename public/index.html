@@ -50,6 +50,8 @@
 </head>
 
 <body>
+    <div id="root"></div>
+
     <noscript>
         <style>
             body {
@@ -62,7 +64,10 @@
                 font-family: "Gothic A1", -apple-system, BlinkMacSystemFont, "Avenir Next", Avenir, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
                 color: #FFFFFF;
 
-                display: block;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
             }
 
             .section-container {
@@ -85,17 +90,15 @@
             }
         </style>
 
-        <div class="noscript-info">
-            <div class="section-container">
-                <div class="section">
-                    <div>
-                        <h2>Please enable JavaScript</h2>
-                        <p>
-                            blymp.io needs JavaScript to be enabled in order to work.
-                            <br />
-                            Please enable JavaScript to use blymp.io.
-                        </p>
-                    </div>
+        <div class="section-container">
+            <div class="section">
+                <div>
+                    <h2>Please enable JavaScript</h2>
+                    <p>
+                        blymp.io needs JavaScript to be enabled in order to work.
+                        <br />
+                        Please enable JavaScript to use blymp.io.
+                    </p>
                 </div>
             </div>
         </div>
