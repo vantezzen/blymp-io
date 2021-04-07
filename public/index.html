@@ -50,8 +50,6 @@
 </head>
 
 <body>
-    <div id="root"></div>
-
     <noscript>
         <style>
             body {
@@ -64,10 +62,7 @@
                 font-family: "Gothic A1", -apple-system, BlinkMacSystemFont, "Avenir Next", Avenir, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
                 color: #FFFFFF;
 
-                display: flex;
-                justify-content: center;
-                align-items: center;
-
+                display: block;
             }
 
             .section-container {
@@ -82,21 +77,115 @@
                 display: flex;
                 justify-content: center;
             }
+            .noscript-info {
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items:center;
+            }
         </style>
 
-        <div class="section-container">
-            <div class="section">
-                <div>
-                    <h2>Please enable JavaScript</h2>
-                    <p>
-                        blymp.io needs JavaScript to be enabled in order to work.
-                        <br />
-                        Please enable JavaScript to use blymp.io.
-                    </p>
+        <div class="noscript-info">
+            <div class="section-container">
+                <div class="section">
+                    <div>
+                        <h2>Please enable JavaScript</h2>
+                        <p>
+                            blymp.io needs JavaScript to be enabled in order to work.
+                            <br />
+                            Please enable JavaScript to use blymp.io.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </noscript>
+
+    <div id="root">
+        <style>
+            body {
+                text-align: center;
+                margin: 0;
+                background-color: #352F44;
+                width: 100%;
+                min-height: 100vh;
+
+                font-family: "Gothic A1", -apple-system, BlinkMacSystemFont, "Avenir Next", Avenir, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+                color: #FFFFFF;
+
+                display: block;
+            }
+
+            .loading-container {
+                display: flex;
+                justify-content: center;
+            }
+            .loading {
+                background-color: #2A2438;
+                padding: 1rem;
+                border-radius: 15px;
+                
+                display: flex;
+                justify-content: center;
+            }
+            .loading-info {
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items:center;
+            }
+        </style>
+
+        <div class="loading-info">
+            <div class="loading-container">
+                <div class="loading">
+                    <div>
+                        <h2>Loading blymp.io...</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h1>blymp.io</h1>
+        <p>Transfer files between any device</p>
+        <h2>Receive</h2>
+        <p>Loading...</p>
+        <p>Give this code to another person in order to receive a file from them</p>
+        <p>By using blymp.io you accept our <a href="#/terms">Terms of Use</a> and <a href="#/privacy">Privacy Policy</a>.</p>
+        <h2>Send</h2>
+        <p>Enter the code given to your by the receiver to send a file to them</p>
+        <p>By entering a receiver code you accept our <a href="#/terms">Terms of Use</a> and <a href="#/privacy">Privacy Policy</a>.</p>
+        <h2>Why blymp.io</h2>
+        <p>Very fast</p>
+        <p>No registration</p>
+        <p>Privacy-oriented</p>
+        <p>Free</p>
+        <p>Open-source</p>You can learn more about blymp.io below.
+        <h2>How it works</h2>
+        <h3>1. Open blymp.io</h3>
+        <p>Open blymp.io on your device you want to send files from and your device you want to receive files on.</p>
+        <h3>2. Exchange the code</h3>
+        <p>The device you want to receive files on will show a 4-digit code. Enter this code on the device you want to send files from.</p>
+        <h3>3. Select your files</h3>
+        <p>Select one or multiple files you want to transfer.</p>
+        <h3>4. Transfer!</h3>
+        <p>Your files will be transferred with the highest speed possible. If your devices support it, all files will be transferred Peer-to-Peer - so that they don't even have to pass our servers.</p>
+        <h2>FAQ</h2>
+        <p>How is this free? Do you sell my data?</p>
+        <p>blymp.io can be used for free because of its underlying architecture: blymp.io tries to transfer files using a peer-to-peer connection, meaning no server needs to be used. Due to this, the hosting for blymp.io is fairly cheep for me, so I can also offer it for free. Even though its free, blymp.io does not save or sell your data! If you'd like to support blymp.io and help keep the service running, please consider donating:</p>
+        <p>How fast will the files be transferred?</p>
+        <p>Transfer speeds depend on a lot of factors, e.g. if your devices are in the same network, your internet speed, whether we can use Peer-to-peer technologies and many more. This is why we can't give an exact transfer speed but we will calculate an estimate time remaining while you transfer a file.</p>
+        <p>How many files can I transfer? How large can the files be?</p>
+        <p>blymp.io allows you to transfer an unlimited amount of files - we don't limit the number of files you can select! The maximum file size a single file can have depends on factors with the receiving device so we can't give an exact amount but we already successfully transferred files with a size of multiple Gigabytes.</p>
+        <p>How do you transfer my files?</p>
+        <p>Short answer: To achieve the best compatability with all kinds of devices, blymp.io can use different technologies to transfer your files. If you want to get a more technical answer: At first, it tries to create a <a href="https://en.wikipedia.org/wiki/WebRTC">WebRTC</a> (Peer-to-Peer) connection. With this connection, files can be transferred very directly without needing to go through our servers. If one of the devices doesn't support WebRTC though, blymp.io tries to use a <a href="https://en.wikipedia.org/wiki/WebSocket">WebSocket</a> connection which still provides reasonable speeds but isn't a Peer-to-peer connection. If both of those methods don't work, blymp.io will use <a href="https://en.wikipedia.org/wiki/XMLHttpRequest">XMLHttpRequests</a>, which is a technology supported by almost all browsers but only provides slow transfer speeds. You can see which of those technologies blymp.io uses when transferring files and you can check if your current browser supports fast transfer speeds on our <a href="#/compatibility">compatibility check</a>.</p>
+        <p>Where can I see the source code?</p>
+        <p>blymp.io's complete source code is open source and can be seen at <a href="https://github.com/vantezzen/blymp-io">https://github.com/vantezzen/blymp-io</a></p>
+        <p>Can I test new features before their release?</p>
+        <p>Yes! You can visit <a href="https://next.blymp.io">next.blymp.io</a> where we test new features before they will be released on the main site.</p>
+        <p>Can I contribute to blymp.io?</p>
+        <p>Yes, contributors are always welcome! If you have some experience with JavaScript and ReactJS, you can dive right into the code at <a href="https://github.com/vantezzen/blymp-io">https://github.com/vantezzen/blymp-io</a></p>
+    </div>
     
     <script async defer src="https://sa.blymp.io/latest.js" data-skip-dnt="true"></script>
     <noscript><img src="https://sa.blymp.io/noscript.gif" alt=""/></noscript>
