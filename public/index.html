@@ -50,8 +50,6 @@
 </head>
 
 <body>
-    <div id="root"></div>
-
     <noscript>
         <style>
             body {
@@ -64,10 +62,7 @@
                 font-family: "Gothic A1", -apple-system, BlinkMacSystemFont, "Avenir Next", Avenir, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
                 color: #FFFFFF;
 
-                display: flex;
-                justify-content: center;
-                align-items: center;
-
+                display: block;
             }
 
             .section-container {
@@ -82,21 +77,31 @@
                 display: flex;
                 justify-content: center;
             }
+            .noscript-info {
+                height: 95vh;
+                display: flex;
+                justify-content: center;
+                align-items:center;
+            }
         </style>
 
-        <div class="section-container">
-            <div class="section">
-                <div>
-                    <h2>Please enable JavaScript</h2>
-                    <p>
-                        blymp.io needs JavaScript to be enabled in order to work.
-                        <br />
-                        Please enable JavaScript to use blymp.io.
-                    </p>
+        <div class="noscript-info">
+            <div class="section-container">
+                <div class="section">
+                    <div>
+                        <h2>Please enable JavaScript</h2>
+                        <p>
+                            blymp.io needs JavaScript to be enabled in order to work.
+                            <br />
+                            Please enable JavaScript to use blymp.io.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </noscript>
+
+    <div id="root"></div>
     
     <script async defer src="https://sa.blymp.io/latest.js" data-skip-dnt="true"></script>
     <noscript><img src="https://sa.blymp.io/noscript.gif" alt=""/></noscript>
