@@ -95,7 +95,6 @@
   },
   "reactSnap": {
     "source": "dist",
-    "skipThirdPartyRequests": true,
-    "puppeteerArgs": ["--no-sandbox", "--disable-setuid-sandbox"]
+    "skipThirdPartyRequests": true
   }
 }
