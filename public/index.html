@@ -64,10 +64,7 @@
                 font-family: "Gothic A1", -apple-system, BlinkMacSystemFont, "Avenir Next", Avenir, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
                 color: #FFFFFF;
 
-                display: flex;
-                justify-content: center;
-                align-items: center;
-
+                display: block;
             }
 
             .section-container {
@@ -90,21 +87,67 @@
             }
         </style>
 
-        <div class="section-container">
-            <div class="section">
-                <div>
-                    <h2>Please enable JavaScript</h2>
-                    <p>
-                        blymp.io needs JavaScript to be enabled in order to work.
-                        <br />
-                        Please enable JavaScript to use blymp.io.
-                    </p>
+        <div class="noscript-info">
+            <div class="section-container">
+                <div class="section">
+                    <div>
+                        <h2>Please enable JavaScript</h2>
+                        <p>
+                            blymp.io needs JavaScript to be enabled in order to work.
+                            <br />
+                            Please enable JavaScript to use blymp.io.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </noscript>
 
     <div id="root">
+        <style>
+            body {
+                text-align: center;
+                margin: 0;
+                background-color: #352F44;
+                width: 100%;
+                min-height: 100vh;
+
+                font-family: "Gothic A1", -apple-system, BlinkMacSystemFont, "Avenir Next", Avenir, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+                color: #FFFFFF;
+
+                display: block;
+            }
+
+            .loading-container {
+                display: flex;
+                justify-content: center;
+            }
+            .loading {
+                background-color: #2A2438;
+                padding: 1rem;
+                border-radius: 15px;
+                
+                display: flex;
+                justify-content: center;
+            }
+            .loading-info {
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items:center;
+            }
+        </style>
+
+        <div class="loading-info">
+            <div class="loading-container">
+                <div class="loading">
+                    <div>
+                        <h2>Loading blymp.io...</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <h1>blymp.io</h1>
         <p>Transfer files between any device</p>
         <h2>Receive</h2>
