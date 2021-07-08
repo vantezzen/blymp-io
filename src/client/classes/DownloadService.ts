@@ -141,6 +141,9 @@ export default class DownloadService {
       // We have successfully transferred all files
       this.transfer.finishedTransfer = true;
       this.onDownloadDone();
+      // Tell partner that we have completed downloading everything
+      debug('Acknowledging transfer to partner...');
+      this.transfer.connection.socket.emit("acknowledge transfer complete", this.transfer.receiverId);
       this.transfer.openPage('/completed');
     }
   }
@@ -157,7 +160,7 @@ export default class DownloadService {
 
       if (this.transfer.connection.method === "webrtc") {
         debug("Acknowledging data received via RTC");
-        this.transfer.connection.socket.emit("acknowledge rtc data", this.transfer.receiverId);
+        // this.transfer.connection.socket.emit("acknowledge rtc data", this.transfer.receiverId);
       }
 
       return;

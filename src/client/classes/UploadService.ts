@@ -85,7 +85,7 @@ export default class UploadService {
         try {
           this.transfer.connection.peer.send(data as SimplePeerData);
           if (callback) {
-            this.transfer.connection.socket.once("acknowledge rtc data", callback);
+            callback();
           }
         } catch (e) {
           debug('Peer connection has been reset - falling back to sockets');
@@ -286,9 +286,19 @@ export default class UploadService {
           // Finish transfer
           debug('Finished transferring all files');
           this.transfer.finishedTransfer = true;
-          this.onUploadDone();
-          this.transfer.openPage('/completed');
-          clearInterval(this.estimateInterval as number);
+          
+          // Wait for partner to confirm they received all data
+          this.transfer.transferStatusText = "Waiting for partner to complete downloading...";
+          this.transfer.triggerUpdate();
+          debug('Waiting for partner to finish transfer...');
+
+          this.transfer.connection.socket.once("acknowledge transfer complete", () => {
+            debug('Partner acknowledge the transfer');
+            this.onUploadDone();
+            this.transfer.openPage('/completed');
+            clearInterval(this.estimateInterval as number);
+          });
+          
           return;
         }
         debug('Transferring next file', this.transfer.currentFile, this.uploadProvider.getNumberOfFiles());

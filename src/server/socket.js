@@ -6,13 +6,54 @@ const debug = require('debug')('blymp:socket');
 // Current file transfers
 const transfers = {};
 
-// Create new transfer connection
-const newTransfer = (socket) => {
+// blymp tries to use easier to remeber 4-digit codes instead of just using
+// random ones. For this, blymp uses different generators
+const easyCodesGenerators = [
+  // Codes in format 1122, 5533, 2288 etc.
+  () => {
+    let num1 = Math.floor(Math.random() * 9 + 1);
+    let num2 = Math.floor(Math.random() * 9 + 1);
+    return Number(`${num1}${num1}${num2}${num2}`);
+  },
+  
+  // Codes in format 1221, 5225, 8118, 9449 etc.
+  () => {
+    let num1 = Math.floor(Math.random() * 9 + 1);
+    let num2 = Math.floor(Math.random() * 9 + 1);
+    return Number(`${num1}${num2}${num2}${num1}`);
+  },
+  
+  // Codes in format 1212, 4545, 8383 etc.
+  () => {
+    let num1 = Math.floor(Math.random() * 9 + 1);
+    let num2 = Math.floor(Math.random() * 9 + 1);
+    return Number(`${num1}${num2}${num1}${num2}`);
+  },
+];
+
+const generateTransferCode = () => {
+  // Try generating an easy code
+  // If we can't find a free one after 10 tries, use a random code instead
+  for(let i = 0; i < 10; i++) {
+    const generator = easyCodesGenerators[Math.floor(Math.random() * easyCodesGenerators.length)];
+    const code = generator();
+    if (!transfers[code]) {
+      return code;
+    }
+  }
+  
   // Find code that is still unused
   let id;
   do {
     id = Math.floor(Math.random() * 8999 + 1000);
   } while (transfers[id]);
+  return id;
+};
+
+// Create new transfer connection
+const newTransfer = (socket) => {
+  // Find code that is still unused
+  let id = generateTransferCode();
 
   // Add id to transfers list
   transfers[id] = {
@@ -256,6 +297,18 @@ module.exports = function setupSockets(io) {
 
       if (id && transfers[id]) {
         io.to(transfers[id].sender).emit('acknowledge rtc data');
+
+        transfers[id].lastActivity = (+new Date());
+      }
+    });
+
+    socket.on('acknowledge transfer complete', (id) => {
+      if (isShadowBanned) {
+        return;
+      }
+
+      if (id && transfers[id]) {
+        io.to(transfers[id].sender).emit('acknowledge transfer complete');
 
         transfers[id].lastActivity = (+new Date());
       }
