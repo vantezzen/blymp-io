@@ -201,6 +201,9 @@ export default class Connection {
 
     // Open the "File selection" screen. This will get called when we are connected
     const openFileSelect = () => {
+      // Don't ever open the selection if the transfer is already done
+      if (this.transfer.finishedTransfer) return;
+
       this.transfer.openPage('/select-file');
 
       if (this.transfer.isSender) {
