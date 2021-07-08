@@ -157,12 +157,6 @@ export default class DownloadService {
     // eslint-disable-next-line no-underscore-dangle
     if ((data as BufferLike)._isBuffer) {
       this.addFileChunk((data as BufferLike).buffer, true);
-
-      if (this.transfer.connection.method === "webrtc") {
-        debug("Acknowledging data received via RTC");
-        // this.transfer.connection.socket.emit("acknowledge rtc data", this.transfer.receiverId);
-      }
-
       return;
     } if (typeof data === 'string') {
       // Test if is file chunk
