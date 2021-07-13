@@ -52,6 +52,8 @@ yarn build (or npm run build)
 yarn start (or npm start)
 ```
 
+Alternatively, you can start blymp.io using Docker using the `DOCKERFILE` and `docker-compose.yml` contained in this repository.
+
 ## Folder Structure
 
 All the source code are inside the **src** directory.

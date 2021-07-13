@@ -1,0 +1,16 @@
+# blymp.io Dockerfile
+# created by https://github.com/ovizii
+
+# Pull base image.
+FROM node:16-buster
+
+# Install desired stuff
+RUN cd /opt && \
+    git clone --verbose https://github.com/vantezzen/blymp-io && \
+    cd /opt/blymp-io && \
+    npm install && \
+    npm run build
+
+WORKDIR /opt/blymp-io
+
+ENTRYPOINT ["npm", "start"]

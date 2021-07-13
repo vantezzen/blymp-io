@@ -1,0 +1,24 @@
+version: '2.2'
+
+services:
+
+# https://github.com/vantezzen/blymp-io
+# blymp.io Docker
+# created by https://github.com/ovizii
+    blymp:
+        build: .
+        image: blymp-io
+        container_name: blymp
+        hostname: blymp
+        restart: "no"
+
+        ports:
+          - 5805:8080
+
+        networks:
+             - sharing
+
+networks:
+    sharing:
+        external:
+            name: sharing
