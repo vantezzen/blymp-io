@@ -1,13 +1,13 @@
 @media (min-width: 900px) {
-  .home-sections {
+  .home-content {
     display: flex;
     width: 100%;
     justify-content: center;
   }
-  .home-sections .section-container {
+  .home-content .section-container {
     margin-left: 2rem;
   }
-  .home-sections .section-container:first-of-type {
+  .home-content .section-container:first-of-type {
     margin-left: 0;
   }
 
@@ -32,6 +32,10 @@
   .faq-area {
     width: 60vw !important;
   }
+}
+.home-top {
+  background-repeat: repeat;
+  background-size: contain;
 }
 a {
   color: #212121;

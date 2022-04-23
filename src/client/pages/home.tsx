@@ -13,6 +13,7 @@ import SelectImg from "../assets/tutorial-select.svg";
 import TransferImg from "../assets/tutorial-transfer.svg";
 
 import faqContent from "../assets/faq-content";
+import blurredBg from "../assets/blurred.png";
 
 import "./home.css";
 import { PropsWithTransfer } from "../types";
@@ -37,125 +38,129 @@ const Faq = React.lazy(
 
 const Home = ({ transfer }: PropsWithTransfer) => (
   <div>
-    <Suspense fallback={<div />}>
-      <Heading fullSize />
-    </Suspense>
+    <div className="home-top" style={{ backgroundImage: `url(${blurredBg})` }}>
+      <Suspense fallback={<div />}>
+        <Heading fullSize />
+      </Suspense>
 
-    {!window.Blob && (
-      <>
-        <Section>
-          <Suspense fallback={<div />}>
-            <InfoCircle color="#FFFFFF" fontSize="50" />
-          </Suspense>
-          <br />
-          Your device does not support the technologies
-          <br />
-          needed to make blymp.io work.
-          <br />
-          <br />
-          Please try using a more modern browser
-          <br />
-          or enabling JavaScript Blobs.
-        </Section>
-        <Spacer size="3rem" />
-      </>
-    )}
+      {!window.Blob && (
+        <>
+          <Section>
+            <Suspense fallback={<div />}>
+              <InfoCircle color="#FFFFFF" fontSize="50" />
+            </Suspense>
+            <br />
+            Your device does not support the technologies
+            <br />
+            needed to make blymp.io work.
+            <br />
+            <br />
+            Please try using a more modern browser
+            <br />
+            or enabling JavaScript Blobs.
+          </Section>
+          <Spacer size="3rem" />
+        </>
+      )}
 
-    <div className="home-sections">
-      <Section>
-        <h3 className="text-secondary">I want to</h3>
-        <h2 className="text-primary underline">
-          receive files
-          <br />
-          from another person
-        </h2>
+      <div className="home-sections">
+        <div className="home-content">
+          <Section>
+            <h3 className="text-secondary">I want to</h3>
+            <h2 className="text-primary underline">
+              receive files
+              <br />
+              from another person
+            </h2>
 
-        {transfer.receiverId ? (
-          <Suspense fallback={<div />}>
-            <CodeInput
-              type="number"
-              name="receiverId"
-              inputMode="numeric"
-              fields={4}
-              className="code-input"
-              value={transfer.receiverId ? String(transfer.receiverId) : ""}
-              disabled
-            />
-          </Suspense>
-        ) : (
-          <div>Loading...</div>
-        )}
+            {transfer.receiverId ? (
+              <Suspense fallback={<div />}>
+                <CodeInput
+                  type="number"
+                  name="receiverId"
+                  inputMode="numeric"
+                  fields={4}
+                  className="code-input"
+                  value={transfer.receiverId ? String(transfer.receiverId) : ""}
+                  disabled
+                />
+              </Suspense>
+            ) : (
+              <div>Loading...</div>
+            )}
 
-        <p>
-          Give this code to the sender
-          <br />
-          to receive files from them
-        </p>
+            <p>
+              Give this code to the sender
+              <br />
+              to receive files from them
+            </p>
 
-        <p className="small-info">
-          By using blymp.io you accept
-          <br />
-          our{" "}
-          <Link to="/terms" style={{ color: "#212121" }}>
-            Terms of Use
-          </Link>
-          {" and "}
-          <Link to="/privacy" style={{ color: "#212121" }}>
-            Privacy Policy
-          </Link>
-          .
-        </p>
-      </Section>
+            <p className="small-info">
+              By using blymp.io you accept
+              <br />
+              our{" "}
+              <Link to="/terms" style={{ color: "#212121" }}>
+                Terms of Use
+              </Link>
+              {" and "}
+              <Link to="/privacy" style={{ color: "#212121" }}>
+                Privacy Policy
+              </Link>
+              .
+            </p>
+          </Section>
 
-      <Spacer size="3rem" />
+          <Spacer size="3rem" />
 
-      <Section>
-        <h3 className="text-secondary">I want to</h3>
-        <h2 className="text-primary underline">
-          send files
-          <br />
-          to another person
-        </h2>
+          <Section>
+            <h3 className="text-secondary">I want to</h3>
+            <h2 className="text-primary underline">
+              send files
+              <br />
+              to another person
+            </h2>
 
-        <Suspense fallback={<div />}>
-          <CodeInput
-            type="number"
-            name="senderId"
-            inputMode="numeric"
-            fields={4}
-            className="code-input"
-            autoFocus
-            onChange={(id) => transfer.useReceiver(Number(id))}
-            inputStyleInvalid={{
-              animation: "shake 0.82s cubic-bezier(.36,.07,.19,.97) both",
-            }}
-            isValid={transfer.isValidId}
-          />
-        </Suspense>
+            <Suspense fallback={<div />}>
+              <CodeInput
+                type="number"
+                name="senderId"
+                inputMode="numeric"
+                fields={4}
+                className="code-input"
+                autoFocus
+                onChange={(id) => transfer.useReceiver(Number(id))}
+                inputStyleInvalid={{
+                  animation: "shake 0.82s cubic-bezier(.36,.07,.19,.97) both",
+                }}
+                isValid={transfer.isValidId}
+              />
+            </Suspense>
 
-        <p>
-          Enter the code given to you by
-          <br />
-          the receiver to send a file to them
-        </p>
+            <p>
+              Enter the code given to you by
+              <br />
+              the receiver to send a file to them
+            </p>
 
-        <p className="small-info">
-          By entering a receiver code you accept
-          <br />
-          our{" "}
-          <Link to="/terms" style={{ color: "#212121" }}>
-            Terms of Use
-          </Link>
-          {" and "}
-          <Link to="/privacy" style={{ color: "#212121" }}>
-            Privacy Policy
-          </Link>
-          .
-        </p>
-      </Section>
+            <p className="small-info">
+              By entering a receiver code you accept
+              <br />
+              our{" "}
+              <Link to="/terms" style={{ color: "#212121" }}>
+                Terms of Use
+              </Link>
+              {" and "}
+              <Link to="/privacy" style={{ color: "#212121" }}>
+                Privacy Policy
+              </Link>
+              .
+            </p>
+          </Section>
+        </div>
+      </div>
+
+      <Separator />
     </div>
-
-    <Separator />
 
     <h2 id="about-us">
       <span className="underline">What's blymp.io?</span>

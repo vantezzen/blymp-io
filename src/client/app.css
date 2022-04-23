@@ -100,6 +100,7 @@ body {
     rgba(103, 52, 211, 0.03) 0%,
     rgba(103, 52, 211, 0.1) 100%
   );
+  backdrop-filter: blur(50px);
   padding: 5rem;
   border-radius: 15px;
 
