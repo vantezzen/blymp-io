@@ -17,6 +17,7 @@ import blurredBg from "../assets/blurred.png";
 
 import "./home.css";
 import { PropsWithTransfer } from "../types";
+import CookieConsent from "../components/CookieConsent";
 
 const Heading = React.lazy(
   () =>
@@ -38,6 +39,7 @@ const Faq = React.lazy(
 
 const Home = ({ transfer }: PropsWithTransfer) => (
   <div>
+    <CookieConsent />
     <div className="home-top" style={{ backgroundImage: `url(${blurredBg})` }}>
       <Suspense fallback={<div />}>
         <Heading fullSize />
@@ -161,6 +163,8 @@ const Home = ({ transfer }: PropsWithTransfer) => (
 
       <Separator />
     </div>
+
+    <div id="700285345"></div>
 
     <h2 id="about-us">
       <span className="underline">What's blymp.io?</span>

@@ -265,3 +265,11 @@ button:disabled {
 .compatibility h5 svg {
   margin-right: 0.5em;
 }
+
+.legal-text {
+  text-align: left;
+  margin: 3rem;
+  padding: 3rem;
+  background: #ffffff;
+  border-radius: 15px;
+}
