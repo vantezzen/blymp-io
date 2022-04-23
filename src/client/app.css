@@ -54,10 +54,12 @@ body {
   margin-bottom: 0;
 }
 .underline {
-  border-bottom: solid 15px #8641d4;
-  /* text-decoration: underline;
+  /* border-bottom: solid 15px #8641d4; */
+  text-decoration: underline;
   text-decoration-thickness: 10px;
-  text-decoration-color: #8641d4; */
+  text-decoration-color: #8641d4;
+  text-decoration-skip-ink: none;
+  text-underline-offset: -5px;
 }
 
 .centered {
@@ -74,6 +76,14 @@ body {
 .heading h1 {
   font-size: 3rem;
   margin: 2rem 0 8rem;
+}
+@media (max-width: 768px) {
+  .heading h2 {
+    margin: 2rem 0;
+  }
+  .heading h1 {
+    margin: 2rem 0;
+  }
 }
 .heading a {
   text-decoration: none;
@@ -95,6 +105,11 @@ body {
 
   display: flex;
   justify-content: center;
+}
+@media (max-width: 768px) {
+  .section {
+    padding: 2rem;
+  }
 }
 
 .small-info {
@@ -147,7 +162,7 @@ body {
 }
 
 @media only screen and (min-width: 900px) and (max-width: 1100px),
-  (max-width: 350px) {
+  (max-width: 400px) {
   .code-input input {
     font-size: 3rem;
     height: 60px;
@@ -156,7 +171,7 @@ body {
     border-radius: 5px;
   }
 }
-@media only screen and (max-width: 250px) {
+@media only screen and (max-width: 300px) {
   .code-input input {
     font-size: 3rem;
     height: 40px;

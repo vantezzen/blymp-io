@@ -87,9 +87,9 @@ const Home = ({ transfer }: PropsWithTransfer) => (
         )}
 
         <p>
-          Give this code to the sender to receive
+          Give this code to the sender
           <br />
-          files from them
+          to receive files from them
         </p>
 
         <p className="small-info">
@@ -134,7 +134,7 @@ const Home = ({ transfer }: PropsWithTransfer) => (
         </Suspense>
 
         <p>
-          Enter the code given to your by
+          Enter the code given to you by
           <br />
           the receiver to send a file to them
         </p>
