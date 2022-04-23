@@ -1,4 +1,4 @@
-@media(min-width: 900px) {
+@media (min-width: 900px) {
   .home-sections {
     display: flex;
     width: 100%;
@@ -34,7 +34,7 @@
   }
 }
 a {
-  color: #FFFFFF;
+  color: #212121;
 }
 .feature {
   margin-top: 4rem;
@@ -55,9 +55,9 @@ a {
   width: 80vw;
 
   --faq-bg-color: transparent;
-  --row-title-color: white;
-  --row-content-color: white;
-  --arrow-color: white;
+  --row-title-color: #212121;
+  --row-content-color: #212121;
+  --arrow-color: #212121;
 }
 .faq-area > div > section > section > div:first-of-type {
   /* FAQ Area Heading */
@@ -69,5 +69,5 @@ a {
   margin: 1em;
 }
 .faq-area a {
-  color: #FFFFFF;
+  color: #212121;
 }

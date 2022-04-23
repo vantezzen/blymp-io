@@ -1,12 +1,15 @@
-import React, {Suspense} from 'react';
-import {
-  HashRouter as Router,
-} from 'react-router-dom';
-import '@openfonts/gothic-a1_latin';
-import './app.css';
+import React, { Suspense } from "react";
+import { HashRouter as Router } from "react-router-dom";
+import "@fontsource/montserrat";
+import "@fontsource/montserrat/900.css";
+import "@fontsource/montserrat/700.css";
+import "@fontsource/montserrat/800.css";
+import "./app.css";
 
-import Routes from './Routes';
-const Footer = React.lazy(() => import(/* webpackChunkName: "footer" */ './components/Footer'));
+import Routes from "./Routes";
+const Footer = React.lazy(
+  () => import(/* webpackChunkName: "footer" */ "./components/Footer")
+);
 
 const App = () => (
   <Router>

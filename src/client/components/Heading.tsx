@@ -1,30 +1,23 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import Planet from 'react-ionicons/lib/MdPlanet';
-import { Link } from 'react-router-dom';
+import React from "react";
+import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
-import Spacer from './Spacer';
+import Spacer from "./Spacer";
 
 type HeadingProps = {
-  fullSize: boolean
-}
+  fullSize: boolean;
+};
 
-const Heading = ({ fullSize } : HeadingProps) => (
+const Heading = ({ fullSize }: HeadingProps) => (
   <div className="heading">
     <Link to="/">
-      <Planet
-        fontSize="100"
-        color="#FFFFFF"
-      />
+      <h2 className="text-secondary">blymp.io</h2>
     </Link>
     {fullSize && (
       <>
-        <h1>
-          {window.location.hostname.includes('next.blymp.io') ? (
-            <span style={{ fontFamily: 'monospace', fontWeight: 'lighter' }}>next.blymp.io</span>
-          ) : 'blymp.io'}
+        <h1 className="text-primary">
+          <span className="underline">No bullsh*t file transfer</span>
         </h1>
-        <p style={{ color: '#B4B4B4', marginTop: 0 }}>Transfer files between any device</p>
       </>
     )}
 

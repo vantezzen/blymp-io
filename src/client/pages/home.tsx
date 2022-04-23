@@ -1,29 +1,41 @@
-import React, {Suspense} from 'react';
-import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import React, { Suspense } from "react";
+import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
-import Section from '../components/Section';
-import Spacer from '../components/Spacer';
-import Separator from '../components/Separator';
-import Checktext from '../components/Checktext';
-import Transfer from '../classes/Transfer';
+import Section from "../components/Section";
+import Spacer from "../components/Spacer";
+import Separator from "../components/Separator";
+import Transfer from "../classes/Transfer";
 
-import ConnectImg from '../assets/tutorial-connect.svg';
-import CodeImg from '../assets/tutorial-code.svg';
-import SelectImg from '../assets/tutorial-select.svg';
-import TransferImg from '../assets/tutorial-transfer.svg';
+import ConnectImg from "../assets/tutorial-connect.svg";
+import CodeImg from "../assets/tutorial-code.svg";
+import SelectImg from "../assets/tutorial-select.svg";
+import TransferImg from "../assets/tutorial-transfer.svg";
 
-import faqContent from '../assets/faq-content';
+import faqContent from "../assets/faq-content";
 
-import './home.css';
-import { PropsWithTransfer } from '../types';
+import "./home.css";
+import { PropsWithTransfer } from "../types";
 
-const Heading = React.lazy(() => import(/* webpackChunkName: "components-heading" */ '../components/Heading'));
-const InfoCircle = React.lazy(() => import(/* webpackChunkName: "ionicons-info-circle" */ 'react-ionicons/lib/IosWarningOutline'));
-const CodeInput = React.lazy(() => import(/* webpackChunkName: "react-code-input" */ 'react-code-input'));
-const Faq = React.lazy(() => import(/* webpackChunkName: "react-faq-component" */ 'react-faq-component'));
+const Heading = React.lazy(
+  () =>
+    import(/* webpackChunkName: "components-heading" */ "../components/Heading")
+);
+const InfoCircle = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "ionicons-info-circle" */ "react-ionicons/lib/IosWarningOutline"
+    )
+);
+const CodeInput = React.lazy(
+  () => import(/* webpackChunkName: "react-code-input" */ "react-code-input")
+);
+const Faq = React.lazy(
+  () =>
+    import(/* webpackChunkName: "react-faq-component" */ "react-faq-component")
+);
 
-const Home = ({ transfer } : PropsWithTransfer) => (
+const Home = ({ transfer }: PropsWithTransfer) => (
   <div>
     <Suspense fallback={<div />}>
       <Heading fullSize />
@@ -51,9 +63,14 @@ const Home = ({ transfer } : PropsWithTransfer) => (
 
     <div className="home-sections">
       <Section>
-        <h2>Receive</h2>
+        <h3 className="text-secondary">I want to</h3>
+        <h2 className="text-primary underline">
+          receive files
+          <br />
+          from another person
+        </h2>
 
-        { transfer.receiverId ? (
+        {transfer.receiverId ? (
           <Suspense fallback={<div />}>
             <CodeInput
               type="number"
@@ -61,32 +78,29 @@ const Home = ({ transfer } : PropsWithTransfer) => (
               inputMode="numeric"
               fields={4}
               className="code-input"
-              value={transfer.receiverId ? String(transfer.receiverId) : ''}
+              value={transfer.receiverId ? String(transfer.receiverId) : ""}
               disabled
             />
           </Suspense>
         ) : (
-          <div>
-            Loading...
-          </div>
+          <div>Loading...</div>
         )}
 
         <p>
-          Give this code to another person
+          Give this code to the sender to receive
           <br />
-          in order to receive a file from them
+          files from them
         </p>
 
         <p className="small-info">
           By using blymp.io you accept
           <br />
-          our
-          {' '}
-          <Link to="/terms" style={{ color: '#FFFFFF' }}>
+          our{" "}
+          <Link to="/terms" style={{ color: "#212121" }}>
             Terms of Use
           </Link>
-          {' and '}
-          <Link to="/privacy" style={{ color: '#FFFFFF' }}>
+          {" and "}
+          <Link to="/privacy" style={{ color: "#212121" }}>
             Privacy Policy
           </Link>
           .
@@ -96,7 +110,12 @@ const Home = ({ transfer } : PropsWithTransfer) => (
       <Spacer size="3rem" />
 
       <Section>
-        <h2>Send</h2>
+        <h3 className="text-secondary">I want to</h3>
+        <h2 className="text-primary underline">
+          send files
+          <br />
+          to another person
+        </h2>
 
         <Suspense fallback={<div />}>
           <CodeInput
@@ -106,9 +125,9 @@ const Home = ({ transfer } : PropsWithTransfer) => (
             fields={4}
             className="code-input"
             autoFocus
-            onChange={id => transfer.useReceiver(Number(id))}
+            onChange={(id) => transfer.useReceiver(Number(id))}
             inputStyleInvalid={{
-              animation: 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both',
+              animation: "shake 0.82s cubic-bezier(.36,.07,.19,.97) both",
             }}
             isValid={transfer.isValidId}
           />
@@ -123,91 +142,74 @@ const Home = ({ transfer } : PropsWithTransfer) => (
         <p className="small-info">
           By entering a receiver code you accept
           <br />
-          our
-          {' '}
-          <Link to="/terms" style={{ color: '#FFFFFF' }}>
+          our{" "}
+          <Link to="/terms" style={{ color: "#212121" }}>
             Terms of Use
           </Link>
-          {' and '}
-          <Link to="/privacy" style={{ color: '#FFFFFF' }}>
+          {" and "}
+          <Link to="/privacy" style={{ color: "#212121" }}>
             Privacy Policy
           </Link>
           .
         </p>
       </Section>
-
-      <Spacer size="3rem" />
-
-      <Section>
-        <h2>Why blymp.io</h2>
-
-        <Checktext>
-          Very fast
-        </Checktext>
-        <Checktext>
-          No registration
-        </Checktext>
-        <Checktext>
-          Privacy-oriented
-        </Checktext>
-        <Checktext>
-          Free
-        </Checktext>
-        <Checktext>
-          Open-source
-        </Checktext>
-        You can learn more about blymp.io below.
-      </Section>
     </div>
 
     <Separator />
 
-    {window.location.hostname.includes('next.blymp.io') && (
-      <>
-        <Section>
-          <div style={{ margin: 30 }}>
-            <h2>Welcome to next.blymp.io!</h2>
-            <p>
-              Thank you for testing the newest features of blymp.io.<br />
-              If you find any bugs or have other feedback, please post it on <a href="https://github.com/vantezzen/blymp-io/issues">https://github.com/vantezzen/blymp-io/issues</a>.
-            </p>
-            <p>
-              Please keep in mind that this site runs independent from the normal blymp.io,<br />
-              meaning that the 4-digit codes from the normal blymp.io won't work here and vice versa. 
-            </p>
-          </div>
-        </Section>
+    <h2 id="about-us">
+      <span className="underline">What's blymp.io?</span>
+    </h2>
+    <div className="centered">
+      <div className="about-us-container">
+        <p>
+          Frustrated by existing solutions, we created blymp.io to enable
+          bullsh*t free, privacy-oriented file transfers between devices.
+        </p>
+        <p>
+          Using blymp.io, files will be transferred directly instead of being
+          uploaded to a server (if supported by both devices) - making it
+          blazingly fast and ensuring that your data can't be stored by us.
+        </p>
+        <p>
+          We've also added some nice additions like automatic compression and
+          decompression and fallback methods for older devices to ensure files
+          are sent as efficiently as possible.
+        </p>
+        <p>
+          blymp.io is free and it's code is open source so you can verify
+          exactly what blymp is doing behind the scenes.
+        </p>
+      </div>
+    </div>
 
-        <Spacer size="3rem" />
-      </>
-    )}
+    <Separator />
 
-    <h2 id="how-it-works">How it works</h2>
+    <h2 id="how-it-works">
+      <span className="underline">How do I use it?</span>
+    </h2>
     <div className="feature">
       <img src={ConnectImg} alt="Connect" />
 
       <div>
-        <h3>
-          1. Open blymp.io
-        </h3>
+        <h3>1. Open blymp.io</h3>
         <p>
-          Open blymp.io on your device you want to send files from and your device you want to receive files on.
+          Open blymp.io on your device you want to send files from and your
+          device you want to receive files on.
         </p>
       </div>
-      
     </div>
 
     <div className="feature reverse">
       <div>
-        <h3>
-          2. Exchange the code
-        </h3>
+        <h3>2. Exchange the code</h3>
         <p>
-          The device you want to receive files on will show a 4-digit code.<br />
+          The device you want to receive files on will show a 4-digit code.
+          <br />
           Enter this code on the device you want to send files from.
         </p>
       </div>
-      
+
       <img src={CodeImg} alt="Exchange the code" />
     </div>
 
@@ -215,27 +217,22 @@ const Home = ({ transfer } : PropsWithTransfer) => (
       <img src={SelectImg} alt="Select files" />
 
       <div>
-        <h3>
-          3. Select your files
-        </h3>
-        <p>
-          Select one or multiple files you want to transfer.
-        </p>
+        <h3>3. Select your files</h3>
+        <p>Select one or multiple files you want to transfer.</p>
       </div>
-      
     </div>
 
     <div className="feature reverse">
       <div>
-        <h3>
-          4. Transfer!
-        </h3>
+        <h3>4. Transfer!</h3>
         <p>
-          Your files will be transferred with the highest speed possible.<br />
-          If your devices support it, all files will be transferred Peer-to-Peer - so that they don't even have to pass our servers.
+          Your files will be transferred with the highest speed possible.
+          <br />
+          If your devices support it, all files will be transferred Peer-to-Peer
+          - so that they don't even have to pass our servers.
         </p>
       </div>
-      
+
       <img src={TransferImg} alt="Transfer files" />
     </div>
 
@@ -253,6 +250,5 @@ const Home = ({ transfer } : PropsWithTransfer) => (
 Home.propTypes = {
   transfer: PropTypes.instanceOf(Transfer).isRequired,
 };
-
 
 export default Home;

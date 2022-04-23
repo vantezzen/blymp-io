@@ -15,6 +15,7 @@
   "author": "Bennett Hollstein",
   "license": "MIT",
   "dependencies": {
+    "@fontsource/montserrat": "^4.5.7",
     "@openfonts/gothic-a1_latin": "^1.44.0",
     "@types/react": "^17.0.1",
     "@types/react-dom": "^17.0.0",
