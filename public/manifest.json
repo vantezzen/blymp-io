@@ -17,8 +17,8 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#FFFFFF",
-  "background_color": "#352F44",
+  "theme_color": "#212121",
+  "background_color": "#8641d4",
   "share_target": {
     "action": "/_share",
     "method": "POST",
