@@ -12,6 +12,9 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "lint": "eslint --fix src"
   },
+  "engines": {
+    "node": "14.x"
+  },
   "author": "Bennett Hollstein",
   "license": "MIT",
   "dependencies": {
