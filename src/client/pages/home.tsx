@@ -69,7 +69,7 @@ const Home = ({ transfer }: PropsWithTransfer) => (
         <div className="home-content">
           <Section>
             <h3 className="text-secondary">I want to</h3>
-            <h2 className="text-primary underline">
+            <h2 className="text-primary underline mb-8">
               receive files
               <br />
               from another person
@@ -116,7 +116,7 @@ const Home = ({ transfer }: PropsWithTransfer) => (
 
           <Section>
             <h3 className="text-secondary">I want to</h3>
-            <h2 className="text-primary underline">
+            <h2 className="text-primary underline mb-8">
               send files
               <br />
               to another person
