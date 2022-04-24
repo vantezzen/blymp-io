@@ -12,12 +12,12 @@ import CodeImg from "../assets/tutorial-code.svg";
 import SelectImg from "../assets/tutorial-select.svg";
 import TransferImg from "../assets/tutorial-transfer.svg";
 
-import faqContent from "../assets/faq-content";
 import blurredBg from "../assets/blurred.png";
 
 import "./home.css";
 import { PropsWithTransfer } from "../types";
 import CookieConsent from "../components/CookieConsent";
+import Navbar from "../components/Navbar";
 
 const Heading = React.lazy(
   () =>
@@ -32,14 +32,11 @@ const InfoCircle = React.lazy(
 const CodeInput = React.lazy(
   () => import(/* webpackChunkName: "react-code-input" */ "react-code-input")
 );
-const Faq = React.lazy(
-  () =>
-    import(/* webpackChunkName: "react-faq-component" */ "react-faq-component")
-);
 
 const Home = ({ transfer }: PropsWithTransfer) => (
   <div>
     <CookieConsent />
+    <Navbar />
     <div className="home-top" style={{ backgroundImage: `url(${blurredBg})` }}>
       <Suspense fallback={<div />}>
         <Heading fullSize />
@@ -243,15 +240,6 @@ const Home = ({ transfer }: PropsWithTransfer) => (
       </div>
 
       <img src={TransferImg} alt="Transfer files" />
-    </div>
-
-    <h2>FAQ</h2>
-    <div className="faq-area-container">
-      <div className="faq-area">
-        <Suspense fallback={<div />}>
-          <Faq data={faqContent} />
-        </Suspense>
-      </div>
     </div>
   </div>
 );

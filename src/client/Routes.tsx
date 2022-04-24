@@ -42,6 +42,13 @@ const Imprint = React.lazy(
 const Compatibility = React.lazy(
   () => import(/* webpackChunkName: "compatability" */ "./pages/compatibility")
 );
+const FaqPage = React.lazy(
+  () => import(/* webpackChunkName: "gaq" */ "./pages/faq")
+);
+const HowAreFilesTransferred = React.lazy(
+  () =>
+    import(/* webpackChunkName: "gaq" */ "./pages/how-are-files-transferred")
+);
 
 const defaultTransfer = new Transfer();
 
@@ -116,6 +123,16 @@ const Routes = ({ location }: RouteComponentProps) => {
           <Route path="/compatibility">
             <Suspense fallback={<div>Loading...</div>}>
               <Compatibility />
+            </Suspense>
+          </Route>
+          <Route path="/faq">
+            <Suspense fallback={<div>Loading...</div>}>
+              <FaqPage />
+            </Suspense>
+          </Route>
+          <Route path="/how-are-files-transferred">
+            <Suspense fallback={<div>Loading...</div>}>
+              <HowAreFilesTransferred />
             </Suspense>
           </Route>
           <Route path="/">
