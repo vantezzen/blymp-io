@@ -222,18 +222,22 @@ body {
 .file-input label,
 button {
   color: #f1e5e6;
-  background-color: #212121;
-  max-width: 80%;
+  background-color: #212121 !important;
   font-size: 1.25rem;
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
-  display: inline-block;
   overflow: hidden;
   padding: 1.5rem;
   border: 0;
   border-radius: 0.5rem;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 1.5rem;
 }
 button:disabled {
   background-color: #b3b3b3;
@@ -246,6 +250,23 @@ button:disabled {
   fill: currentColor;
   margin-top: -0.25em;
   margin-right: 1em;
+}
+.file-info {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 1.5rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  color: #212121;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Footer */
