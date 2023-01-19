@@ -18,6 +18,7 @@ import "./home.css";
 import { PropsWithTransfer } from "../types";
 import CookieConsent from "../components/CookieConsent";
 import Navbar from "../components/Navbar";
+import NeonFinInfo from "../components/NeonFinInfo";
 
 const Heading = React.lazy(
   () =>
@@ -162,6 +163,8 @@ const Home = ({ transfer }: PropsWithTransfer) => (
     </div>
 
     <div id="700285345"></div>
+
+    <NeonFinInfo />
 
     <h2 id="about-us">
       <span className="underline">What's blymp.io?</span>

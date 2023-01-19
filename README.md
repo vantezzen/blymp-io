@@ -17,10 +17,12 @@ It uses modern technologies like WebRTC, Blobs and WebSockets to allow files to 
 
 You can use blymp.io by going to <https://blymp.io>. Feeling adventurous? Try blymp.io's newest features on <https://next.blymp.io>
 
+- [Features](#features)
 - [Quick Start](#quick-start)
 - [Folder Structure](#folder-structure)
 
 ## Features
+
 - [x] WebRTC file transfer
 - [x] PWA
 - [x] No registration
@@ -52,7 +54,7 @@ yarn build (or npm run build)
 yarn start (or npm start)
 ```
 
-Alternatively, you can start blymp.io using Docker using the `DOCKERFILE` and `docker-compose.yml` contained in this repository.
+Alternatively, you can start blymp.io using Docker using the `Dockerfile` contained in this repository.
 
 ## Folder Structure
 

@@ -17,7 +17,6 @@ function Navbar() {
           <div className="flex lg:hidden">
             <button
               type="button"
-              className="text-gray-900"
               onClick={() => setExpanded(!expanded)}
               aria-expanded={expanded}
             >
