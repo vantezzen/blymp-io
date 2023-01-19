@@ -5,4 +5,4 @@ import * as serviceWorkerRegistration from "./register-worker";
 
 ReactDOM.render(<App />, document.getElementById("root"));
 
-serviceWorkerRegistration.register();
+serviceWorkerRegistration.unregister();

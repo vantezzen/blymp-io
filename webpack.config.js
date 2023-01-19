@@ -67,18 +67,6 @@ module.exports = {
         },
       ],
     }),
-    new WorkboxPlugin.InjectManifest({
-      swSrc: path.join(process.cwd(), "/src/client/worker.js"),
-      swDest: "worker.js",
-      exclude: [
-        /\.map$/,
-        /manifest$/,
-        /\.htaccess$/,
-        /service-worker\.js$/,
-        /sw\.js$/,
-        /\.DS_Store$/,
-      ],
-    }),
     new HtmlWebpackPlugin({
       template: "./public/index.html",
       chunks: ["main"],
